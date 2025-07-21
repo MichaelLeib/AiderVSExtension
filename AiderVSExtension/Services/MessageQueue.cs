@@ -342,12 +342,12 @@ namespace AiderVSExtension.Services
         public MessagePriority Priority { get; set; }
         public MessageStatus Status { get; set; }
         public DateTime EnqueuedAt { get; set; }
-        public DateTime? DequeuedAt { get; set; }
-        public DateTime? CompletedAt { get; set; }
+        public DateTime DequeuedAt { get; set; }
+        public DateTime CompletedAt { get; set; }
         public DateTime ExpiresAt { get; set; }
         public int RetryCount { get; set; }
-        public DateTime? LastRetryAt { get; set; }
-        public DateTime? NextRetryAt { get; set; }
+        public DateTime LastRetryAt { get; set; }
+        public DateTime NextRetryAt { get; set; }
         public string LastError { get; set; }
         public Dictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
     }
@@ -399,7 +399,7 @@ namespace AiderVSExtension.Services
         public int HighPriorityMessages { get; set; }
         public int NormalPriorityMessages { get; set; }
         public int LowPriorityMessages { get; set; }
-        public DateTime? OldestMessage { get; set; }
-        public DateTime? NewestMessage { get; set; }
+        public DateTime OldestMessage { get; set; }
+        public DateTime NewestMessage { get; set; }
     }
 }

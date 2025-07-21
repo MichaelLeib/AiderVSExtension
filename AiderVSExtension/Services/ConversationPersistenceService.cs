@@ -147,7 +147,7 @@ namespace AiderVSExtension.Services
         /// </summary>
         /// <param name="conversationId">The ID of the conversation to load</param>
         /// <returns>The loaded conversation, or null if not found</returns>
-        public async Task<Conversation?> LoadConversationAsync(string conversationId)
+        public async Task<Conversation> LoadConversationAsync(string conversationId)
         {
             if (string.IsNullOrWhiteSpace(conversationId))
                 throw new ArgumentException("Conversation ID cannot be null or empty", nameof(conversationId));
@@ -538,7 +538,7 @@ namespace AiderVSExtension.Services
         /// </summary>
         /// <param name="conversationId">The conversation ID</param>
         /// <returns>The file path if found, null otherwise</returns>
-        private string? FindConversationFile(string conversationId)
+        private string FindConversationFile(string conversationId)
         {
             var activePath = GetConversationFilePath(conversationId, false);
             if (File.Exists(activePath))

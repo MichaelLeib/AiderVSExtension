@@ -216,7 +216,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Estimated time remaining
         /// </summary>
-        public TimeSpan? EstimatedTimeRemaining { get; set; }
+        public TimeSpan EstimatedTimeRemaining { get; set; }
 
         /// <summary>
         /// Initialization start time
@@ -513,7 +513,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Last unload time
         /// </summary>
-        public DateTime? LastUnloadTime { get; set; }
+        public DateTime LastUnloadTime { get; set; }
 
         /// <summary>
         /// Average loading time

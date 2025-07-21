@@ -27,19 +27,19 @@ namespace AiderVSExtension.Models
         /// API key for the provider (required for ChatGPT and Claude)
         /// </summary>
         [JsonPropertyName("apiKey")]
-        public string? ApiKey { get; set; }
+        public string ApiKey { get; set; }
 
         /// <summary>
         /// Endpoint URL (primarily for Ollama local/remote endpoints)
         /// </summary>
         [JsonPropertyName("endpointUrl")]
-        public string? EndpointUrl { get; set; }
+        public string EndpointUrl { get; set; }
 
         /// <summary>
         /// Alias for EndpointUrl for backward compatibility
         /// </summary>
         [JsonIgnore]
-        public string? Endpoint 
+        public string Endpoint 
         { 
             get => EndpointUrl; 
             set => EndpointUrl = value; 
@@ -49,7 +49,7 @@ namespace AiderVSExtension.Models
         /// Specific model name to use
         /// </summary>
         [JsonPropertyName("modelName")]
-        public string? ModelName { get; set; }
+        public string ModelName { get; set; }
 
         /// <summary>
         /// Whether this configuration is enabled
@@ -181,13 +181,17 @@ namespace AiderVSExtension.Models
         /// <returns>Connection string for display purposes</returns>
         public string GetConnectionString()
         {
-            return Provider switch
+            switch (Provider)
             {
-                AIProvider.ChatGPT => $"OpenAI API ({ModelName ?? "default"})",
-                AIProvider.Claude => $"Anthropic API ({ModelName ?? "default"})",
-                AIProvider.Ollama => $"Ollama at {EndpointUrl} ({ModelName ?? "default"})",
-                _ => "Unknown provider"
-            };
+                case AIProvider.ChatGPT:
+                    return $"OpenAI API ({ModelName ?? "default"})";
+                case AIProvider.Claude:
+                    return $"Anthropic API ({ModelName ?? "default"})";
+                case AIProvider.Ollama:
+                    return $"Ollama at {EndpointUrl} ({ModelName ?? "default"})";
+                default:
+                    return "Unknown provider";
+            }
         }
 
         /// <summary>

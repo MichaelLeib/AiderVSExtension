@@ -176,7 +176,7 @@ namespace AiderVSExtension.Interfaces
         /// <summary>
         /// Timeout for message processing
         /// </summary>
-        public TimeSpan? Timeout { get; set; }
+        public TimeSpan Timeout { get; set; }
 
         /// <summary>
         /// Whether the message has been completed
@@ -186,7 +186,7 @@ namespace AiderVSExtension.Interfaces
         /// <summary>
         /// Timestamp when message was completed
         /// </summary>
-        public DateTime? CompletedAt { get; set; }
+        public DateTime CompletedAt { get; set; }
 
         /// <summary>
         /// Whether the message has failed
@@ -201,7 +201,7 @@ namespace AiderVSExtension.Interfaces
         /// <summary>
         /// Timestamp when message failed
         /// </summary>
-        public DateTime? FailedAt { get; set; }
+        public DateTime FailedAt { get; set; }
     }
 
     /// <summary>

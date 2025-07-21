@@ -81,12 +81,12 @@ namespace AiderVSExtension.Interfaces
         /// <summary>
         /// Line number associated with the error, if available
         /// </summary>
-        public int? LineNumber { get; set; }
+        public int LineNumber { get; set; }
 
         /// <summary>
         /// Column number associated with the error, if available
         /// </summary>
-        public int? ColumnNumber { get; set; }
+        public int ColumnNumber { get; set; }
 
         /// <summary>
         /// Error code, if available

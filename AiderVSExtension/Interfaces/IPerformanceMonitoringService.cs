@@ -58,7 +58,7 @@ namespace AiderVSExtension.Interfaces
         /// Clears old performance data
         /// </summary>
         /// <param name="olderThan">Clear data older than this date</param>
-        Task ClearOldDataAsync(DateTime? olderThan = null);
+        Task ClearOldDataAsync(DateTime olderThan = default);
 
         /// <summary>
         /// Sets performance thresholds for monitoring

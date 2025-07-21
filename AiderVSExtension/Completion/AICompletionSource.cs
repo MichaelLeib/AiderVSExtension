@@ -187,7 +187,7 @@ namespace AiderVSExtension.Completion
             }
         }
 
-        private SnapshotSpan? FindApplicableSpan(SnapshotPoint triggerLocation)
+        private SnapshotSpan FindApplicableSpan(SnapshotPoint triggerLocation)
         {
             try
             {

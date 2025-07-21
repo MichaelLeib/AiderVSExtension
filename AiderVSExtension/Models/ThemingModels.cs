@@ -242,37 +242,37 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Background color
         /// </summary>
-        public Color? BackgroundColor { get; set; }
+        public Color BackgroundColor { get; set; }
 
         /// <summary>
         /// Foreground color
         /// </summary>
-        public Color? ForegroundColor { get; set; }
+        public Color ForegroundColor { get; set; }
 
         /// <summary>
         /// Border color
         /// </summary>
-        public Color? BorderColor { get; set; }
+        public Color BorderColor { get; set; }
 
         /// <summary>
         /// Border thickness
         /// </summary>
-        public Thickness? BorderThickness { get; set; }
+        public Thickness BorderThickness { get; set; }
 
         /// <summary>
         /// Corner radius
         /// </summary>
-        public CornerRadius? CornerRadius { get; set; }
+        public CornerRadius CornerRadius { get; set; }
 
         /// <summary>
         /// Padding
         /// </summary>
-        public Thickness? Padding { get; set; }
+        public Thickness Padding { get; set; }
 
         /// <summary>
         /// Margin
         /// </summary>
-        public Thickness? Margin { get; set; }
+        public Thickness Margin { get; set; }
 
         /// <summary>
         /// Font family
@@ -282,17 +282,17 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Font size
         /// </summary>
-        public double? FontSize { get; set; }
+        public double FontSize { get; set; }
 
         /// <summary>
         /// Font weight
         /// </summary>
-        public FontWeight? FontWeight { get; set; }
+        public FontWeight FontWeight { get; set; }
 
         /// <summary>
         /// Font style
         /// </summary>
-        public FontStyle? FontStyle { get; set; }
+        public FontStyle FontStyle { get; set; }
 
         /// <summary>
         /// Additional properties

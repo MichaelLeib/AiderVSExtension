@@ -169,8 +169,8 @@ namespace AiderVSExtension.Interfaces
     public class ConfigurationChangedEventArgs : EventArgs
     {
         public string Key { get; set; }
-        public object? OldValue { get; set; }
-        public object? NewValue { get; set; }
+        public object OldValue { get; set; }
+        public object NewValue { get; set; }
     }
 
 
@@ -181,8 +181,8 @@ namespace AiderVSExtension.Interfaces
     public class MigrationResult
     {
         public bool IsSuccessful { get; set; }
-        public string? FromVersion { get; set; }
-        public string? ToVersion { get; set; }
+        public string FromVersion { get; set; }
+        public string ToVersion { get; set; }
         public List<string> MigrationSteps { get; set; }
         public List<string> Warnings { get; set; }
 

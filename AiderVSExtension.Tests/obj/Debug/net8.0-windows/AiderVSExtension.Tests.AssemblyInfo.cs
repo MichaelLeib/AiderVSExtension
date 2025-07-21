@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AiderVSExtension.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb8e0c5a34b5c0680928b84b249d2ea8fe32e2c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("AiderVSExtension.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AiderVSExtension.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

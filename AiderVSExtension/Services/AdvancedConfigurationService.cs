@@ -1662,6 +1662,78 @@ namespace AiderVSExtension.Services
 
         #endregion
 
+        #region IConfigurationService Implementation - Missing Methods
+
+        /// <summary>
+        /// Tests the connection for a specific configuration
+        /// </summary>
+        public async Task<ConnectionTestResult> TestConnectionAsync(AIModelConfiguration configuration)
+        {
+            return await _baseConfigurationService.TestConnectionAsync(configuration);
+        }
+
+        /// <summary>
+        /// Validates a specific configuration
+        /// </summary>
+        public async Task<ConfigurationValidationResult> ValidateConfigurationAsync(AIModelConfiguration configuration)
+        {
+            return await _baseConfigurationService.ValidateConfigurationAsync(configuration);
+        }
+
+        /// <summary>
+        /// Saves a configuration asynchronously
+        /// </summary>
+        public async Task SaveConfigurationAsync(AIModelConfiguration configuration)
+        {
+            await _baseConfigurationService.SetAIModelConfigurationAsync(configuration);
+        }
+
+        /// <summary>
+        /// Gets a configuration asynchronously
+        /// </summary>
+        public async Task<AIModelConfiguration> GetConfigurationAsync()
+        {
+            return await Task.FromResult(_baseConfigurationService.GetAIModelConfiguration());
+        }
+
+        /// <summary>
+        /// Gets a configuration synchronously
+        /// </summary>
+        public AIModelConfiguration GetConfiguration()
+        {
+            return _baseConfigurationService.GetAIModelConfiguration();
+        }
+
+        /// <summary>
+        /// Gets whether AI completion is enabled
+        /// </summary>
+        public bool IsAICompletionEnabled
+        {
+            get => _baseConfigurationService.GetValue(Constants.ConfigurationKeys.AICompletionEnabled, Constants.DefaultValues.DefaultAICompletionEnabled);
+            set => _baseConfigurationService.SetValue(Constants.ConfigurationKeys.AICompletionEnabled, value);
+        }
+
+        /// <summary>
+        /// Toggles AI completion on/off
+        /// </summary>
+        public async Task ToggleAICompletionAsync()
+        {
+            var current = IsAICompletionEnabled;
+            IsAICompletionEnabled = !current;
+            
+            // Fire configuration changed event
+            ConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs
+            {
+                Key = Constants.ConfigurationKeys.AICompletionEnabled,
+                OldValue = current,
+                NewValue = IsAICompletionEnabled
+            });
+
+            await Task.CompletedTask;
+        }
+
+        #endregion
+
         public void Dispose()
         {
             Dispose(true);

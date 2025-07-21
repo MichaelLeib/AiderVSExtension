@@ -393,12 +393,12 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// The line number in the old file
         /// </summary>
-        public int? OldLineNumber { get; set; }
+        public int OldLineNumber { get; set; }
 
         /// <summary>
         /// The line number in the new file
         /// </summary>
-        public int? NewLineNumber { get; set; }
+        public int NewLineNumber { get; set; }
     }
 
     /// <summary>

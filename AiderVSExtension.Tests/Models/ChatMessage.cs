@@ -49,7 +49,7 @@ namespace AiderVSExtension.Models
         /// AI model used to generate this message (for Assistant messages)
         /// </summary>
         [JsonPropertyName("modelUsed")]
-        public string? ModelUsed { get; set; }
+        public string ModelUsed { get; set; }
 
         /// <summary>
         /// Validates the chat message properties

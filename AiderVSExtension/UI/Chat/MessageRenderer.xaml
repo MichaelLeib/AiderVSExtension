@@ -13,18 +13,18 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         
         <!-- Visual Studio Theme Colors -->
-        <SolidColorBrush x:Key="ToolWindowBackground" Color="{DynamicResource {x:Static shell:VsColors.ToolWindowBackgroundKey}}"/>
-        <SolidColorBrush x:Key="ToolWindowBorder" Color="{DynamicResource {x:Static shell:VsColors.ToolWindowBorderKey}}"/>
-        <SolidColorBrush x:Key="ToolWindowText" Color="{DynamicResource {x:Static shell:VsColors.ToolWindowTextKey}}"/>
-        <SolidColorBrush x:Key="ButtonFace" Color="{DynamicResource {x:Static shell:VsColors.ButtonFaceKey}}"/>
+        <SolidColorBrush x:Key="ToolWindowBackground" Color="{DynamicResource {x:Static SystemColors.WindowColor}}"/>
+        <SolidColorBrush x:Key="ToolWindowBorder" Color="{DynamicResource {x:Static SystemColors.ToolWindowBorderKey}}"/>
+        <SolidColorBrush x:Key="ToolWindowText" Color="{DynamicResource {x:Static SystemColors.ToolWindowTextKey}}"/>
+        <SolidColorBrush x:Key="ButtonFace" Color="{DynamicResource {x:Static SystemColors.ButtonFaceKey}}"/>
         <SolidColorBrush x:Key="ButtonBorder" Color="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
-        <SolidColorBrush x:Key="WindowBackground" Color="{DynamicResource {x:Static shell:VsColors.WindowKey}}"/>
-        <SolidColorBrush x:Key="WindowText" Color="{DynamicResource {x:Static shell:VsColors.WindowTextKey}}"/>
-        <SolidColorBrush x:Key="AccentMedium" Color="{DynamicResource {x:Static shell:VsColors.AccentMediumKey}}"/>
-        <SolidColorBrush x:Key="AccentLight" Color="{DynamicResource {x:Static shell:VsColors.AccentLightKey}}"/>
-        <SolidColorBrush x:Key="InfoBackground" Color="{DynamicResource {x:Static shell:VsColors.InfoBackgroundKey}}"/>
-        <SolidColorBrush x:Key="InfoBorder" Color="{DynamicResource {x:Static shell:VsColors.InfoBorderKey}}"/>
-        <SolidColorBrush x:Key="HyperlinkText" Color="{DynamicResource {x:Static shell:VsColors.PanelHyperlinkKey}}"/>
+        <SolidColorBrush x:Key="WindowBackground" Color="{DynamicResource {x:Static SystemColors.WindowKey}}"/>
+        <SolidColorBrush x:Key="WindowText" Color="{DynamicResource {x:Static SystemColors.WindowTextKey}}"/>
+        <SolidColorBrush x:Key="AccentMedium" Color="{DynamicResource {x:Static SystemColors.AccentMediumKey}}"/>
+        <SolidColorBrush x:Key="AccentLight" Color="{DynamicResource {x:Static SystemColors.AccentLightKey}}"/>
+        <SolidColorBrush x:Key="InfoBackground" Color="{DynamicResource {x:Static SystemColors.InfoBackgroundKey}}"/>
+        <SolidColorBrush x:Key="InfoBorder" Color="{DynamicResource {x:Static SystemColors.InfoBorderKey}}"/>
+        <SolidColorBrush x:Key="HyperlinkText" Color="{DynamicResource {x:Static SystemColors.PanelHyperlinkKey}}"/>
         
         <!-- Message styles based on type -->
         <Style x:Key="UserMessageStyle" TargetType="Border">
@@ -81,7 +81,7 @@
         <!-- Timestamp style -->
         <Style x:Key="TimestampStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextKey}}"/>
             <Setter Property="Margin" Value="0,4,0,0"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
@@ -164,7 +164,7 @@
                                         
                                         <TextBlock Text="{Binding FilePath}"
                                                   FontSize="11"
-                                                  Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}"
+                                                  Foreground="{DynamicResource {x:Static SystemColors.GrayTextKey}}"
                                                   Visibility="{Binding HasFilePath, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     </StackPanel>
                                 </Grid>

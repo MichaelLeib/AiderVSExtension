@@ -440,7 +440,7 @@ namespace AiderVSExtension.Services
         {
             public string Value { get; set; }
             public DateTime CreatedAt { get; set; }
-            public DateTime? ExpiresAt { get; set; }
+            public DateTime ExpiresAt { get; set; }
             public EncryptionLevel EncryptionLevel { get; set; }
             public Dictionary<string, string> Metadata { get; set; }
         }
@@ -449,7 +449,7 @@ namespace AiderVSExtension.Services
         {
             public string Key { get; set; }
             public DateTime CreatedAt { get; set; }
-            public DateTime? ExpiresAt { get; set; }
+            public DateTime ExpiresAt { get; set; }
             public EncryptionLevel EncryptionLevel { get; set; }
             public bool Persistent { get; set; }
         }

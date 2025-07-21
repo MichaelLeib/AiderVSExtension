@@ -42,7 +42,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Migration end time
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         /// <summary>
         /// Whether migration was successful
@@ -62,7 +62,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Migration duration
         /// </summary>
-        public TimeSpan Duration => EndTime.HasValue ? EndTime.Value - StartTime : DateTime.UtcNow - StartTime;
+        public TimeSpan Duration => EndTime - StartTime;
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Step end time
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         /// <summary>
         /// Whether step was successful
@@ -108,7 +108,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Step duration
         /// </summary>
-        public TimeSpan Duration => EndTime.HasValue ? EndTime.Value - StartTime : DateTime.UtcNow - StartTime;
+        public TimeSpan Duration => EndTime - StartTime;
     }
 
     /// <summary>

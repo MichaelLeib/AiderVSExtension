@@ -280,11 +280,11 @@ namespace AiderVSExtension.Services
         /// Clears old performance data
         /// </summary>
         /// <param name="olderThan">Clear data older than this date</param>
-        public async Task ClearOldDataAsync(DateTime? olderThan = null)
+        public async Task ClearOldDataAsync(DateTime olderThan = default)
         {
             try
             {
-                var cutoffDate = olderThan ?? DateTime.UtcNow.AddHours(-24);
+                var cutoffDate = olderThan == default ? DateTime.UtcNow.AddHours(-24) : olderThan;
                 
                 var keysToRemove = _metrics.Values
                     .Where(m => m.StartTime < cutoffDate)

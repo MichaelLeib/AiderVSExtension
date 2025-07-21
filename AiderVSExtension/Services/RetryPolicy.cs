@@ -15,12 +15,12 @@ namespace AiderVSExtension.Services
         private readonly TimeSpan _baseDelay;
         private readonly TimeSpan _maxDelay;
 
-        public RetryPolicy(IErrorHandler errorHandler = null, int maxAttempts = 3, TimeSpan? baseDelay = null, TimeSpan? maxDelay = null)
+        public RetryPolicy(IErrorHandler errorHandler = null, int maxAttempts = 3, TimeSpan baseDelay = default, TimeSpan maxDelay = default)
         {
             _errorHandler = errorHandler;
             _maxAttempts = maxAttempts;
-            _baseDelay = baseDelay ?? TimeSpan.FromSeconds(1);
-            _maxDelay = maxDelay ?? TimeSpan.FromMinutes(1);
+            _baseDelay = baseDelay == default ? TimeSpan.FromSeconds(1) : baseDelay;
+            _maxDelay = maxDelay == default ? TimeSpan.FromMinutes(1) : maxDelay;
         }
 
         /// <summary>
@@ -47,12 +47,12 @@ namespace AiderVSExtension.Services
         public async Task<T> ExecuteWithRetryAsync<T>(
             Func<Task<T>> operation,
             int maxAttempts = 3,
-            TimeSpan? baseDelay = null,
-            TimeSpan? maxDelay = null,
+            TimeSpan baseDelay = default,
+            TimeSpan maxDelay = default,
             CancellationToken cancellationToken = default)
         {
-            var actualBaseDelay = baseDelay ?? TimeSpan.FromSeconds(1);
-            var actualMaxDelay = maxDelay ?? TimeSpan.FromMinutes(1);
+            var actualBaseDelay = baseDelay == default ? TimeSpan.FromSeconds(1) : baseDelay;
+            var actualMaxDelay = maxDelay == default ? TimeSpan.FromMinutes(1) : maxDelay;
             
             Exception lastException = null;
 
@@ -100,8 +100,8 @@ namespace AiderVSExtension.Services
         public async Task ExecuteWithRetryAsync(
             Func<Task> operation,
             int maxAttempts = 3,
-            TimeSpan? baseDelay = null,
-            TimeSpan? maxDelay = null,
+            TimeSpan baseDelay = default,
+            TimeSpan maxDelay = default,
             CancellationToken cancellationToken = default)
         {
             await ExecuteWithRetryAsync(async () =>
@@ -123,10 +123,10 @@ namespace AiderVSExtension.Services
         public async Task<T> ExecuteWithLinearRetryAsync<T>(
             Func<Task<T>> operation,
             int maxAttempts = 3,
-            TimeSpan? delay = null,
+            TimeSpan delay = default,
             CancellationToken cancellationToken = default)
         {
-            var actualDelay = delay ?? TimeSpan.FromSeconds(2);
+            var actualDelay = delay == default ? TimeSpan.FromSeconds(2) : delay;
             Exception lastException = null;
 
             for (int attempt = 1; attempt <= maxAttempts; attempt++)

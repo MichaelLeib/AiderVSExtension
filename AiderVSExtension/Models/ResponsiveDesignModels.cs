@@ -79,37 +79,37 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Minimum width
         /// </summary>
-        public double? MinWidth { get; set; }
+        public double MinWidth { get; set; }
 
         /// <summary>
         /// Maximum width
         /// </summary>
-        public double? MaxWidth { get; set; }
+        public double MaxWidth { get; set; }
 
         /// <summary>
         /// Minimum height
         /// </summary>
-        public double? MinHeight { get; set; }
+        public double MinHeight { get; set; }
 
         /// <summary>
         /// Maximum height
         /// </summary>
-        public double? MaxHeight { get; set; }
+        public double MaxHeight { get; set; }
 
         /// <summary>
         /// Preferred width
         /// </summary>
-        public double? PreferredWidth { get; set; }
+        public double PreferredWidth { get; set; }
 
         /// <summary>
         /// Preferred height
         /// </summary>
-        public double? PreferredHeight { get; set; }
+        public double PreferredHeight { get; set; }
 
         /// <summary>
         /// Aspect ratio to maintain
         /// </summary>
-        public double? AspectRatio { get; set; }
+        public double AspectRatio { get; set; }
     }
 
     /// <summary>
@@ -120,42 +120,42 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Horizontal alignment
         /// </summary>
-        public HorizontalAlignment? HorizontalAlignment { get; set; }
+        public HorizontalAlignment HorizontalAlignment { get; set; }
 
         /// <summary>
         /// Vertical alignment
         /// </summary>
-        public VerticalAlignment? VerticalAlignment { get; set; }
+        public VerticalAlignment VerticalAlignment { get; set; }
 
         /// <summary>
         /// Margin
         /// </summary>
-        public Thickness? Margin { get; set; }
+        public Thickness Margin { get; set; }
 
         /// <summary>
         /// Padding (for supported elements)
         /// </summary>
-        public Thickness? Padding { get; set; }
+        public Thickness Padding { get; set; }
 
         /// <summary>
         /// Grid row (for Grid children)
         /// </summary>
-        public int? GridRow { get; set; }
+        public int GridRow { get; set; }
 
         /// <summary>
         /// Grid column (for Grid children)
         /// </summary>
-        public int? GridColumn { get; set; }
+        public int GridColumn { get; set; }
 
         /// <summary>
         /// Grid row span (for Grid children)
         /// </summary>
-        public int? GridRowSpan { get; set; }
+        public int GridRowSpan { get; set; }
 
         /// <summary>
         /// Grid column span (for Grid children)
         /// </summary>
-        public int? GridColumnSpan { get; set; }
+        public int GridColumnSpan { get; set; }
     }
 
     /// <summary>
@@ -243,7 +243,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Container orientation (for supported containers)
         /// </summary>
-        public Orientation? Orientation { get; set; }
+        public Orientation Orientation { get; set; }
 
         /// <summary>
         /// Container background
@@ -253,12 +253,12 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Container margin
         /// </summary>
-        public Thickness? Margin { get; set; }
+        public Thickness Margin { get; set; }
 
         /// <summary>
         /// Container padding
         /// </summary>
-        public Thickness? Padding { get; set; }
+        public Thickness Padding { get; set; }
 
         /// <summary>
         /// Child element arrangements
@@ -294,42 +294,43 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Child visibility
         /// </summary>
-        public Visibility? Visibility { get; set; }
+        public Visibility
+		 Visibility { get; set; }
 
         /// <summary>
         /// Child horizontal alignment
         /// </summary>
-        public HorizontalAlignment? HorizontalAlignment { get; set; }
+        public HorizontalAlignment HorizontalAlignment { get; set; }
 
         /// <summary>
         /// Child vertical alignment
         /// </summary>
-        public VerticalAlignment? VerticalAlignment { get; set; }
+        public VerticalAlignment VerticalAlignment { get; set; }
 
         /// <summary>
         /// Child margin
         /// </summary>
-        public Thickness? Margin { get; set; }
+        public Thickness Margin { get; set; }
 
         /// <summary>
         /// Child flex grow
         /// </summary>
-        public double? FlexGrow { get; set; }
+        public double FlexGrow { get; set; }
 
         /// <summary>
         /// Child flex shrink
         /// </summary>
-        public double? FlexShrink { get; set; }
+        public double FlexShrink { get; set; }
 
         /// <summary>
         /// Child flex basis
         /// </summary>
-        public double? FlexBasis { get; set; }
+        public double FlexBasis { get; set; }
 
         /// <summary>
         /// Child order
         /// </summary>
-        public int? Order { get; set; }
+        public int Order { get; set; }
     }
 
     /// <summary>

@@ -24,7 +24,7 @@ namespace AiderVSExtension.Models
         /// Error message if completion failed
         /// </summary>
         [JsonPropertyName("errorMessage")]
-        public string? ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; }
 
         /// <summary>
         /// Number of tokens used in the completion
@@ -42,7 +42,7 @@ namespace AiderVSExtension.Models
         /// Model used for the completion
         /// </summary>
         [JsonPropertyName("modelUsed")]
-        public string? ModelUsed { get; set; }
+        public string ModelUsed { get; set; }
 
         /// <summary>
         /// Timestamp when the response was generated
@@ -58,7 +58,7 @@ namespace AiderVSExtension.Models
         /// <param name="responseTime">Time taken for completion</param>
         /// <param name="modelUsed">Model used for completion</param>
         /// <returns>Successful completion response</returns>
-        public static CompletionResponse Success(string content, int tokensUsed = 0, TimeSpan responseTime = default, string? modelUsed = null)
+        public static CompletionResponse Success(string content, int tokensUsed = 0, TimeSpan responseTime = default, string modelUsed = null)
         {
             return new CompletionResponse
             {
@@ -76,7 +76,7 @@ namespace AiderVSExtension.Models
         /// <param name="errorMessage">The error message</param>
         /// <param name="modelUsed">Model that was attempted</param>
         /// <returns>Failed completion response</returns>
-        public static CompletionResponse Failure(string errorMessage, string? modelUsed = null)
+        public static CompletionResponse Failure(string errorMessage, string modelUsed = null)
         {
             return new CompletionResponse
             {

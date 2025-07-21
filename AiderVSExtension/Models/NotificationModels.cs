@@ -51,12 +51,12 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Display duration (null for persistent)
         /// </summary>
-        public TimeSpan? Duration { get; set; }
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// Display style
         /// </summary>
-        public NotificationStyle? Style { get; set; }
+        public NotificationStyle Style { get; set; }
 
         /// <summary>
         /// Additional data
@@ -97,7 +97,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Display duration (null for persistent)
         /// </summary>
-        public TimeSpan? Duration { get; set; }
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// Display style
@@ -112,7 +112,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Expiration timestamp
         /// </summary>
-        public DateTime? ExpiresAt { get; set; }
+        public DateTime ExpiresAt { get; set; }
 
         /// <summary>
         /// Additional data
@@ -212,7 +212,7 @@ namespace AiderVSExtension.Models
                     Type = NotificationType.Progress,
                     Title = Title,
                     Message = Message,
-                    Duration = null,
+                    Duration = TimeSpan.Zero,
                     Data = this
                 });
             }

@@ -18,9 +18,9 @@
     <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
     
-    <!-- Assembly Signing -->
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    <!-- Assembly Signing - Disabled for development -->
+    <SignAssembly>false</SignAssembly>
+    <!-- <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile> -->
     <UseCodebase>true</UseCodebase>
     
     <!-- Debug Configuration -->
@@ -37,6 +37,10 @@
     <!-- Disable default inclusions to avoid duplicates -->
     <EnableDefaultPageItems>false</EnableDefaultPageItems>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    
+    <!-- C# Language Version -->
+    <LangVersion>7.3</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -65,15 +69,16 @@
     <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.58" />
     <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost" Version="17.0.491" />
     <PackageReference Include="Microsoft.VisualStudio.Editor" Version="17.0.491" />
-    <PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="17.0.487" />
+    <PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="17.0.491" />
     <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.0.491" />
     <PackageReference Include="Microsoft.VisualStudio.Text.Logic" Version="17.0.491" />
     
     <!-- Third-party packages - Updated for security -->
     <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="6.0.10" />
     <PackageReference Include="OpenAI" Version="1.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -89,6 +94,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsBase" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
 
   <ItemGroup>

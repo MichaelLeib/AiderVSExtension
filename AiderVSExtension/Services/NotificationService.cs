@@ -45,56 +45,56 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Shows an information notification
         /// </summary>
-        public async Task ShowInfoAsync(string message, string title = null, TimeSpan? duration = null)
+        public async Task ShowInfoAsync(string message, string title = null, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = NotificationType.Info,
                 Title = title ?? "Information",
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(5)
+                Duration = duration == default ? TimeSpan.FromSeconds(5) : duration
             });
         }
 
         /// <summary>
         /// Shows a success notification
         /// </summary>
-        public async Task ShowSuccessAsync(string message, string title = null, TimeSpan? duration = null)
+        public async Task ShowSuccessAsync(string message, string title = null, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = NotificationType.Success,
                 Title = title ?? "Success",
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(4)
+                Duration = duration == default ? TimeSpan.FromSeconds(4) : duration
             });
         }
 
         /// <summary>
         /// Shows a warning notification
         /// </summary>
-        public async Task ShowWarningAsync(string message, string title = null, TimeSpan? duration = null)
+        public async Task ShowWarningAsync(string message, string title = null, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = NotificationType.Warning,
                 Title = title ?? "Warning",
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(6)
+                Duration = duration == default ? TimeSpan.FromSeconds(6) : duration
             });
         }
 
         /// <summary>
         /// Shows an error notification
         /// </summary>
-        public async Task ShowErrorAsync(string message, string title = null, TimeSpan? duration = null)
+        public async Task ShowErrorAsync(string message, string title = null, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = NotificationType.Error,
                 Title = title ?? "Error",
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(8)
+                Duration = duration == default ? TimeSpan.FromSeconds(8) : duration
             });
         }
 
@@ -220,14 +220,14 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Shows a toast notification
         /// </summary>
-        public async Task ShowToastAsync(string message, NotificationType type = NotificationType.Info, TimeSpan? duration = null)
+        public async Task ShowToastAsync(string message, NotificationType type = NotificationType.Info, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = type,
                 Title = null,
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(3),
+                Duration = duration == default ? TimeSpan.FromSeconds(3) : duration,
                 Style = NotificationStyle.Toast
             });
         }
@@ -235,14 +235,14 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Shows a status bar notification
         /// </summary>
-        public async Task ShowStatusBarAsync(string message, NotificationType type = NotificationType.Info, TimeSpan? duration = null)
+        public async Task ShowStatusBarAsync(string message, NotificationType type = NotificationType.Info, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = type,
                 Title = null,
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(5),
+                Duration = duration == default ? TimeSpan.FromSeconds(5) : duration,
                 Style = NotificationStyle.StatusBar
             });
         }
@@ -250,14 +250,14 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Shows a balloon notification
         /// </summary>
-        public async Task ShowBalloonAsync(string message, string title = null, NotificationType type = NotificationType.Info, TimeSpan? duration = null)
+        public async Task ShowBalloonAsync(string message, string title = null, NotificationType type = NotificationType.Info, TimeSpan duration = default)
         {
             await ShowNotificationAsync(new NotificationRequest
             {
                 Type = type,
                 Title = title ?? "Notification",
                 Message = message,
-                Duration = duration ?? TimeSpan.FromSeconds(6),
+                Duration = duration == default ? TimeSpan.FromSeconds(6) : duration,
                 Style = NotificationStyle.Balloon
             });
         }

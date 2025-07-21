@@ -366,22 +366,22 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Maximum allowed duration
         /// </summary>
-        public TimeSpan? MaxDuration { get; set; }
+        public TimeSpan MaxDuration { get; set; }
 
         /// <summary>
         /// Maximum allowed memory usage (bytes)
         /// </summary>
-        public long? MaxMemoryUsage { get; set; }
+        public long MaxMemoryUsage { get; set; }
 
         /// <summary>
         /// Maximum allowed CPU usage percentage
         /// </summary>
-        public double? MaxCpuUsage { get; set; }
+        public double MaxCpuUsage { get; set; }
 
         /// <summary>
         /// Maximum allowed error rate percentage
         /// </summary>
-        public double? MaxErrorRate { get; set; }
+        public double MaxErrorRate { get; set; }
 
         /// <summary>
         /// Whether the threshold is enabled
@@ -523,7 +523,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Alert acknowledgment time
         /// </summary>
-        public DateTime? AcknowledgedAt { get; set; }
+        public DateTime AcknowledgedAt { get; set; }
 
         /// <summary>
         /// Additional alert data

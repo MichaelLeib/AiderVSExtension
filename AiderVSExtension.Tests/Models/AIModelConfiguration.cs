@@ -21,19 +21,19 @@ namespace AiderVSExtension.Models
         /// API key for the provider (required for ChatGPT and Claude)
         /// </summary>
         [JsonPropertyName("apiKey")]
-        public string? ApiKey { get; set; }
+        public string ApiKey { get; set; }
 
         /// <summary>
         /// Endpoint URL (primarily for Ollama local/remote endpoints)
         /// </summary>
         [JsonPropertyName("endpointUrl")]
-        public string? EndpointUrl { get; set; }
+        public string EndpointUrl { get; set; }
 
         /// <summary>
         /// Specific model name to use
         /// </summary>
         [JsonPropertyName("modelName")]
-        public string? ModelName { get; set; }
+        public string ModelName { get; set; }
 
         /// <summary>
         /// Whether this configuration is enabled

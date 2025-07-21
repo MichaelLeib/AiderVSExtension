@@ -66,11 +66,11 @@ namespace AiderVSExtension.Models
         /// <param name="isSuccessful">Whether the test was successful</param>
         /// <param name="errorMessage">Error message if failed</param>
         /// <param name="responseTime">Time taken for the test</param>
-        public ConnectionTestResult(bool isSuccessful, string errorMessage = null, TimeSpan? responseTime = null)
+        public ConnectionTestResult(bool isSuccessful, string errorMessage = null, TimeSpan responseTime = default)
         {
             IsSuccessful = isSuccessful;
             ErrorMessage = errorMessage;
-            ResponseTime = responseTime ?? TimeSpan.Zero;
+            ResponseTime = responseTime == default ? TimeSpan.Zero : responseTime;
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace AiderVSExtension.Models
         /// <param name="errorMessage">Error message describing the failure</param>
         /// <param name="responseTime">Time taken before failure</param>
         /// <returns>Failed connection test result</returns>
-        public static ConnectionTestResult Failure(string errorMessage, TimeSpan? responseTime = null)
+        public static ConnectionTestResult Failure(string errorMessage, TimeSpan responseTime = default)
         {
             return new ConnectionTestResult(false, errorMessage, responseTime);
         }

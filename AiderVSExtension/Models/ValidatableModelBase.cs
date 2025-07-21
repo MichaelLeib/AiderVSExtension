@@ -17,7 +17,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Event raised when a property value changes
         /// </summary>
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Gets validation errors for the entire object
@@ -78,7 +78,7 @@ namespace AiderVSExtension.Models
         /// <param name="value">Property value to validate</param>
         /// <param name="propertyName">Name of the property</param>
         /// <returns>True if valid, false otherwise</returns>
-        protected bool ValidateProperty(object? value, [CallerMemberName] string? propertyName = null)
+        protected bool ValidateProperty(object value, [CallerMemberName] string propertyName = null)
         {
             if (propertyName == null) return true;
 
@@ -108,7 +108,7 @@ namespace AiderVSExtension.Models
         /// <param name="value">New value</param>
         /// <param name="propertyName">Name of the property</param>
         /// <returns>True if the value was changed, false otherwise</returns>
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
                 return false;
@@ -123,7 +123,7 @@ namespace AiderVSExtension.Models
         /// Raises the PropertyChanged event
         /// </summary>
         /// <param name="propertyName">Name of the property that changed</param>
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -194,7 +194,7 @@ namespace AiderVSExtension.Models
         /// </summary>
         /// <param name="propertyName">Name of the property</param>
         /// <returns>Error message, or null if no error</returns>
-        public string? GetPropertyError(string propertyName)
+        public string GetPropertyError(string propertyName)
         {
             return _errors.TryGetValue(propertyName, out var error) ? error : null;
         }

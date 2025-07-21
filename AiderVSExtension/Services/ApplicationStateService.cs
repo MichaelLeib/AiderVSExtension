@@ -22,9 +22,9 @@ namespace AiderVSExtension.Services
         private readonly object _lockObject = new object();
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
         
-        private DTE2? _dte;
-        private IVsShell? _vsShell;
-        private SolutionEvents? _solutionEvents;
+        private DTE2 _dte;
+        private IVsShell _vsShell;
+        private SolutionEvents _solutionEvents;
         private bool _disposed = false;
         private DateTime _initializationStartTime;
 
@@ -34,15 +34,15 @@ namespace AiderVSExtension.Services
         private bool _isShuttingDown = false;
         private string _currentTheme = "Unknown";
         private bool _isSolutionOpen = false;
-        private string? _currentSolutionPath = null;
+        private string _currentSolutionPath = null;
 
         // Events
-        public event EventHandler<ExtensionInitializingEventArgs>? ExtensionInitializing;
-        public event EventHandler<ExtensionInitializedEventArgs>? ExtensionInitialized;
-        public event EventHandler<ExtensionShuttingDownEventArgs>? ExtensionShuttingDown;
-        public event EventHandler<ThemeChangedEventArgs>? ThemeChanged;
-        public event EventHandler<SolutionOpenedEventArgs>? SolutionOpened;
-        public event EventHandler<SolutionClosedEventArgs>? SolutionClosed;
+        public event EventHandler<ExtensionInitializingEventArgs> ExtensionInitializing;
+        public event EventHandler<ExtensionInitializedEventArgs> ExtensionInitialized;
+        public event EventHandler<ExtensionShuttingDownEventArgs> ExtensionShuttingDown;
+        public event EventHandler<ThemeChangedEventArgs> ThemeChanged;
+        public event EventHandler<SolutionOpenedEventArgs> SolutionOpened;
+        public event EventHandler<SolutionClosedEventArgs> SolutionClosed;
 
         // Properties
         public bool IsInitializing => _isInitializing;
@@ -50,7 +50,7 @@ namespace AiderVSExtension.Services
         public bool IsShuttingDown => _isShuttingDown;
         public string CurrentTheme => _currentTheme;
         public bool IsSolutionOpen => _isSolutionOpen;
-        public string? CurrentSolutionPath => _currentSolutionPath;
+        public string CurrentSolutionPath => _currentSolutionPath;
 
         public ApplicationStateService()
         {
@@ -481,7 +481,7 @@ namespace AiderVSExtension.Services
             }
         }
 
-        private async Task<IVsOutputWindowPane?> GetOutputWindowAsync()
+        private async Task<IVsOutputWindowPane> GetOutputWindowAsync()
         {
             try
             {
@@ -577,7 +577,7 @@ namespace AiderVSExtension.Services
         public DateTime LastSavedAt { get; set; }
         public string CurrentTheme { get; set; } = string.Empty;
         public bool IsSolutionOpen { get; set; }
-        public string? CurrentSolutionPath { get; set; }
+        public string CurrentSolutionPath { get; set; }
         public string ExtensionVersion { get; set; } = string.Empty;
         public long MemoryUsage { get; set; }
     }

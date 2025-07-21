@@ -30,12 +30,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.CommandBarHoverBackgroundBeginKey}}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.CommandBarTextHoverKey}}"/>
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.CommandBarHoverBackgroundBeginKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.CommandBarTextHoverKey}}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.CommandBarSelectedBackgroundBeginKey}}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.CommandBarTextSelectedKey}}"/>
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.CommandBarSelectedBackgroundBeginKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.CommandBarTextSelectedKey}}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -45,7 +45,7 @@
         
         <Style x:Key="HeaderStyle" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.ToolWindowTextKey}}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ToolWindowTextKey}}"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Margin" Value="10,8,10,4"/>
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}"/>
@@ -54,17 +54,17 @@
         <Style x:Key="SearchBoxStyle" TargetType="TextBox">
             <Setter Property="Margin" Value="10,8"/>
             <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.SearchBoxBackgroundKey}}"/>
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.SearchBoxTextKey}}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsColors.SearchBoxBorderKey}}"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.SearchBoxBackgroundKey}}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.SearchBoxTextKey}}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.SearchBoxBorderKey}}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}"/>
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}"/>
         </Style>
     </UserControl.Resources>
     
-    <Border Background="{DynamicResource {x:Static shell:VsColors.ContextMenuBackgroundKey}}"
-            BorderBrush="{DynamicResource {x:Static shell:VsColors.ContextMenuBorderKey}}"
+    <Border Background="{DynamicResource {x:Static SystemColors.ContextMenuBackgroundKey}}"
+            BorderBrush="{DynamicResource {x:Static SystemColors.ContextMenuBorderKey}}"
             BorderThickness="1"
             CornerRadius="4">
         
@@ -89,7 +89,7 @@
                                         <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
                                             <VisualBrush.Visual>
                                                 <Label Content="Search files..." 
-                                                       Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}" 
+                                                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextKey}}" 
                                                        FontStyle="Italic"/>
                                             </VisualBrush.Visual>
                                         </VisualBrush>
@@ -138,7 +138,7 @@
                                           FontSize="13"/>
                                 <TextBlock Text="{Binding Subtitle}"
                                           FontSize="11"
-                                          Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}"
+                                          Foreground="{DynamicResource {x:Static SystemColors.GrayTextKey}}"
                                           Visibility="{Binding HasSubtitle, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </StackPanel>
                             
@@ -146,7 +146,7 @@
                             <TextBlock Grid.Column="2"
                                       Text="{Binding KeyboardShortcut}"
                                       FontSize="11"
-                                      Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}"
+                                      Foreground="{DynamicResource {x:Static SystemColors.GrayTextKey}}"
                                       Margin="10,0,0,0"
                                       VerticalAlignment="Center"
                                       Visibility="{Binding HasKeyboardShortcut, Converter={StaticResource BooleanToVisibilityConverter}}"/>

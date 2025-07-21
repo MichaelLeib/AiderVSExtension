@@ -44,12 +44,12 @@ namespace AiderVSExtension.Exceptions
         /// <summary>
         /// Gets the HTTP status code if applicable
         /// </summary>
-        public int? HttpStatusCode { get; set; }
+        public int HttpStatusCode { get; set; }
 
         /// <summary>
         /// Gets the WebSocket close status if applicable
         /// </summary>
-        public System.Net.WebSockets.WebSocketCloseStatus? WebSocketCloseStatus { get; set; }
+        public System.Net.WebSockets.WebSocketCloseStatus WebSocketCloseStatus { get; set; }
 
         /// <summary>
         /// Gets the response content if available

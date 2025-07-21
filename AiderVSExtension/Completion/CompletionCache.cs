@@ -16,11 +16,11 @@ namespace AiderVSExtension.Completion
         private readonly TimeSpan _cacheExpiration;
         private readonly int _maxCacheSize;
 
-        public CompletionCache(TimeSpan? cacheExpiration = null, int maxCacheSize = 1000)
+        public CompletionCache(TimeSpan cacheExpiration = default, int maxCacheSize = 1000)
         {
             _completionCache = new ConcurrentDictionary<string, CacheEntry<IEnumerable<CompletionItem>>>();
             _detailsCache = new ConcurrentDictionary<string, CacheEntry<CompletionDetails>>();
-            _cacheExpiration = cacheExpiration ?? TimeSpan.FromMinutes(5);
+            _cacheExpiration = cacheExpiration == default ? TimeSpan.FromMinutes(5) : cacheExpiration;
             _maxCacheSize = maxCacheSize;
         }
 

@@ -88,7 +88,7 @@ namespace AiderVSExtension.Interfaces
         public bool ShouldContinue { get; set; }
         public bool ShouldRetry { get; set; }
         public string UserMessage { get; set; }
-        public TimeSpan? RetryDelay { get; set; }
+        public TimeSpan RetryDelay { get; set; }
         public Dictionary<string, object> AdditionalData { get; set; }
 
         public ErrorHandlingResult()

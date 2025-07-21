@@ -26,7 +26,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="message">Message to display</param>
         /// <param name="title">Optional title</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowInfoAsync(string message, string title = null, TimeSpan? duration = null);
+        Task ShowInfoAsync(string message, string title = null, TimeSpan duration = default);
 
         /// <summary>
         /// Shows a success notification
@@ -34,7 +34,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="message">Message to display</param>
         /// <param name="title">Optional title</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowSuccessAsync(string message, string title = null, TimeSpan? duration = null);
+        Task ShowSuccessAsync(string message, string title = null, TimeSpan duration = default);
 
         /// <summary>
         /// Shows a warning notification
@@ -42,7 +42,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="message">Message to display</param>
         /// <param name="title">Optional title</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowWarningAsync(string message, string title = null, TimeSpan? duration = null);
+        Task ShowWarningAsync(string message, string title = null, TimeSpan duration = default);
 
         /// <summary>
         /// Shows an error notification
@@ -50,7 +50,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="message">Message to display</param>
         /// <param name="title">Optional title</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowErrorAsync(string message, string title = null, TimeSpan? duration = null);
+        Task ShowErrorAsync(string message, string title = null, TimeSpan duration = default);
 
         /// <summary>
         /// Shows a progress notification
@@ -90,7 +90,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="message">Message to display</param>
         /// <param name="type">Notification type</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowToastAsync(string message, NotificationType type = NotificationType.Info, TimeSpan? duration = null);
+        Task ShowToastAsync(string message, NotificationType type = NotificationType.Info, TimeSpan duration = default);
 
         /// <summary>
         /// Shows a status bar notification
@@ -98,7 +98,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="message">Message to display</param>
         /// <param name="type">Notification type</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowStatusBarAsync(string message, NotificationType type = NotificationType.Info, TimeSpan? duration = null);
+        Task ShowStatusBarAsync(string message, NotificationType type = NotificationType.Info, TimeSpan duration = default);
 
         /// <summary>
         /// Shows a balloon notification
@@ -107,7 +107,7 @@ namespace AiderVSExtension.Interfaces
         /// <param name="title">Optional title</param>
         /// <param name="type">Notification type</param>
         /// <param name="duration">Optional duration</param>
-        Task ShowBalloonAsync(string message, string title = null, NotificationType type = NotificationType.Info, TimeSpan? duration = null);
+        Task ShowBalloonAsync(string message, string title = null, NotificationType type = NotificationType.Info, TimeSpan duration = default);
     }
 
     /// <summary>

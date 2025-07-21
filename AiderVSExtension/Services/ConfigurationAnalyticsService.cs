@@ -372,11 +372,11 @@ namespace AiderVSExtension.Services
         /// Clears analytics data
         /// </summary>
         /// <param name="olderThan">Clear data older than this date</param>
-        public async Task ClearAnalyticsDataAsync(DateTime? olderThan = null)
+        public async Task ClearAnalyticsDataAsync(DateTime olderThan = default)
         {
             try
             {
-                var cutoffDate = olderThan ?? DateTime.UtcNow.AddDays(-90);
+                var cutoffDate = olderThan == default ? DateTime.UtcNow.AddDays(-90) : olderThan;
                 
                 _usageMetrics.RemoveAll(m => m.Timestamp < cutoffDate);
                 _performanceMetrics.RemoveAll(m => m.Timestamp < cutoffDate);

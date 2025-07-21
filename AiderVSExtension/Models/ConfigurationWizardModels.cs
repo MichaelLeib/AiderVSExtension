@@ -31,7 +31,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Session end time
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         /// <summary>
         /// Whether the session is active
@@ -76,7 +76,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Session duration
         /// </summary>
-        public TimeSpan Duration => EndTime.HasValue ? EndTime.Value - StartTime : DateTime.UtcNow - StartTime;
+        public TimeSpan Duration => EndTime - StartTime;
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Step completion time
         /// </summary>
-        public DateTime? CompletedAt { get; set; }
+        public DateTime CompletedAt { get; set; }
 
         /// <summary>
         /// Step fields
@@ -314,7 +314,7 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Template last modified date
         /// </summary>
-        public DateTime? LastModified { get; set; }
+        public DateTime LastModified { get; set; }
     }
 
     /// <summary>

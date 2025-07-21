@@ -21,7 +21,7 @@ namespace AiderVSExtension.Interfaces
         /// </summary>
         /// <param name="conversationId">The ID of the conversation to load</param>
         /// <returns>The loaded conversation, or null if not found</returns>
-        Task<Conversation?> LoadConversationAsync(string conversationId);
+        Task<Conversation> LoadConversationAsync(string conversationId);
 
         /// <summary>
         /// Deletes a conversation from persistent storage

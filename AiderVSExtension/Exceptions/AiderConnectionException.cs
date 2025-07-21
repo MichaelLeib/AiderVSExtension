@@ -49,6 +49,6 @@ namespace AiderVSExtension.Exceptions
         /// <summary>
         /// Gets the timeout duration if applicable
         /// </summary>
-        public TimeSpan? Timeout { get; set; }
+        public TimeSpan Timeout { get; set; }
     }
 }

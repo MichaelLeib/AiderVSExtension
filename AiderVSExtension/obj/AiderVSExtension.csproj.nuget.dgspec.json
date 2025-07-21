@@ -61,35 +61,35 @@
             },
             "Microsoft.VisualStudio.ComponentModelHost": {
               "target": "Package",
-              "version": "[17.0.67, )"
+              "version": "[17.0.491, )"
             },
             "Microsoft.VisualStudio.Editor": {
               "target": "Package",
-              "version": "[17.0.67, )"
+              "version": "[17.0.491, )"
             },
             "Microsoft.VisualStudio.Language.Intellisense": {
               "target": "Package",
-              "version": "[17.0.67, )"
+              "version": "[17.0.491, )"
             },
             "Microsoft.VisualStudio.SDK": {
               "target": "Package",
-              "version": "[17.0.31903.59, )"
+              "version": "[17.0.32112.339, )"
             },
             "Microsoft.VisualStudio.Shell.Framework": {
               "target": "Package",
-              "version": "[17.0.31903.59, )"
+              "version": "[17.0.32112.339, )"
             },
             "Microsoft.VisualStudio.Shell.Interop": {
               "target": "Package",
-              "version": "[17.0.31903.59, )"
+              "version": "[17.0.32112.339, )"
             },
             "Microsoft.VisualStudio.Text.Logic": {
               "target": "Package",
-              "version": "[17.0.67, )"
+              "version": "[17.0.491, )"
             },
             "Microsoft.VisualStudio.Text.UI.Wpf": {
               "target": "Package",
-              "version": "[17.0.67, )"
+              "version": "[17.0.491, )"
             },
             "Microsoft.VisualStudio.Threading": {
               "target": "Package",
@@ -97,7 +97,7 @@
             },
             "Microsoft.VisualStudio.Utilities": {
               "target": "Package",
-              "version": "[17.0.31903.59, )"
+              "version": "[17.0.32112.339, )"
             },
             "Microsoft.VisualStudio.Validation": {
               "target": "Package",
@@ -117,7 +117,7 @@
             },
             "System.Text.Json": {
               "target": "Package",
-              "version": "[6.0.9, )"
+              "version": "[6.0.10, )"
             }
           },
           "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"

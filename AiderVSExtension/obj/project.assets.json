@@ -596,7 +596,7 @@
           }
         }
       },
-      "Microsoft.VisualStudio.ComponentModelHost/17.0.487": {
+      "Microsoft.VisualStudio.ComponentModelHost/17.0.491": {
         "type": "package",
         "dependencies": {
           "Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime": "17.0.31723.112",
@@ -765,21 +765,21 @@
           }
         }
       },
-      "Microsoft.VisualStudio.Editor/17.0.487": {
+      "Microsoft.VisualStudio.Editor/17.0.491": {
         "type": "package",
         "dependencies": {
-          "Microsoft.VisualStudio.CoreUtility": "17.0.487",
+          "Microsoft.VisualStudio.CoreUtility": "17.0.491",
           "Microsoft.VisualStudio.GraphModel": "17.0.31723.112",
           "Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime": "17.0.31723.112",
           "Microsoft.VisualStudio.Interop": "17.0.31723.112",
-          "Microsoft.VisualStudio.Language": "17.0.487",
+          "Microsoft.VisualStudio.Language": "17.0.491",
           "Microsoft.VisualStudio.ProjectAggregator": "17.0.31723.112",
           "Microsoft.VisualStudio.RpcContracts": "17.0.51",
           "Microsoft.VisualStudio.Shell.15.0": "17.0.31723.112",
-          "Microsoft.VisualStudio.Text.Data": "17.0.487",
-          "Microsoft.VisualStudio.Text.Logic": "17.0.487",
-          "Microsoft.VisualStudio.Text.UI": "17.0.487",
-          "Microsoft.VisualStudio.Text.UI.Wpf": "17.0.487",
+          "Microsoft.VisualStudio.Text.Data": "17.0.491",
+          "Microsoft.VisualStudio.Text.Logic": "17.0.491",
+          "Microsoft.VisualStudio.Text.UI": "17.0.491",
+          "Microsoft.VisualStudio.Text.UI.Wpf": "17.0.491",
           "Microsoft.VisualStudio.Threading": "17.0.63",
           "Microsoft.VisualStudio.Validation": "17.0.28"
         },
@@ -955,15 +955,15 @@
           }
         }
       },
-      "Microsoft.VisualStudio.Language.Intellisense/17.0.487": {
+      "Microsoft.VisualStudio.Language.Intellisense/17.0.491": {
         "type": "package",
         "dependencies": {
-          "Microsoft.VisualStudio.CoreUtility": "17.0.487",
+          "Microsoft.VisualStudio.CoreUtility": "17.0.491",
           "Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime": "17.0.31723.112",
-          "Microsoft.VisualStudio.Language": "17.0.487",
-          "Microsoft.VisualStudio.Text.Data": "17.0.487",
-          "Microsoft.VisualStudio.Text.Logic": "17.0.487",
-          "Microsoft.VisualStudio.Text.UI": "17.0.487",
+          "Microsoft.VisualStudio.Language": "17.0.491",
+          "Microsoft.VisualStudio.Text.Data": "17.0.491",
+          "Microsoft.VisualStudio.Text.Logic": "17.0.491",
+          "Microsoft.VisualStudio.Text.UI": "17.0.491",
           "System.Runtime.CompilerServices.Unsafe": "5.0.0"
         },
         "frameworkAssemblies": [
@@ -1583,11 +1583,11 @@
           }
         }
       },
-      "Microsoft.VisualStudio.Text.Logic/17.0.448": {
+      "Microsoft.VisualStudio.Text.Logic/17.0.491": {
         "type": "package",
         "dependencies": {
-          "Microsoft.VisualStudio.CoreUtility": "17.0.448",
-          "Microsoft.VisualStudio.Text.Data": "17.0.448",
+          "Microsoft.VisualStudio.CoreUtility": "17.0.491",
+          "Microsoft.VisualStudio.Text.Data": "17.0.491",
           "System.Collections.Immutable": "5.0.0",
           "System.ComponentModel.Composition": "4.5.0"
         },
@@ -1621,14 +1621,14 @@
           }
         }
       },
-      "Microsoft.VisualStudio.Text.UI.Wpf/17.0.487": {
+      "Microsoft.VisualStudio.Text.UI.Wpf/17.0.491": {
         "type": "package",
         "dependencies": {
-          "Microsoft.VisualStudio.CoreUtility": "17.0.487",
+          "Microsoft.VisualStudio.CoreUtility": "17.0.491",
           "Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime": "17.0.31723.112",
-          "Microsoft.VisualStudio.Text.Data": "17.0.487",
-          "Microsoft.VisualStudio.Text.Logic": "17.0.487",
-          "Microsoft.VisualStudio.Text.UI": "17.0.487"
+          "Microsoft.VisualStudio.Text.Data": "17.0.491",
+          "Microsoft.VisualStudio.Text.Logic": "17.0.491",
+          "Microsoft.VisualStudio.Text.UI": "17.0.491"
         },
         "frameworkAssemblies": [
           "PresentationCore",
@@ -2752,7 +2752,7 @@
           }
         }
       },
-      "System.Text.Json/6.0.9": {
+      "System.Text.Json/6.0.10": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
@@ -4114,10 +4114,10 @@
         "microsoft.visualstudio.commandbars.nuspec"
       ]
     },
-    "Microsoft.VisualStudio.ComponentModelHost/17.0.487": {
-      "sha512": "mIvfzFYYtPbf+aZRLjtOmMfksKPGML2U2z7RqHJ+m0AVTumssJbOpaD5gOgYcUvE6+AjFoUpg+NLVjwxdZnVYQ==",
+    "Microsoft.VisualStudio.ComponentModelHost/17.0.491": {
+      "sha512": "zQUJ+6w6agjjcyNHUhgxVdXpnVaf3ge7EM4JxgydYIDQvxKt64SZwgPxegbiqSPIsauzVl+U1ovniAQbmQdARw==",
       "type": "package",
-      "path": "microsoft.visualstudio.componentmodelhost/17.0.487",
+      "path": "microsoft.visualstudio.componentmodelhost/17.0.491",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4127,7 +4127,7 @@
         "lib/net472/Microsoft.VisualStudio.ComponentModelHost.xml",
         "lib/netstandard2.0/Microsoft.VisualStudio.ComponentModelHost.dll",
         "lib/netstandard2.0/Microsoft.VisualStudio.ComponentModelHost.xml",
-        "microsoft.visualstudio.componentmodelhost.17.0.487.nupkg.sha512",
+        "microsoft.visualstudio.componentmodelhost.17.0.491.nupkg.sha512",
         "microsoft.visualstudio.componentmodelhost.nuspec"
       ]
     },
@@ -4280,10 +4280,10 @@
         "microsoft.visualstudio.designer.interfaces.nuspec"
       ]
     },
-    "Microsoft.VisualStudio.Editor/17.0.487": {
-      "sha512": "UuIMD8xLAkvwuszD7jlc4ADRckr59eyJ7YJFepTtja2IDMzt5SAGa0kxxjUQ3Zeg0KuhuwcZBwuYmSCgx5YSjA==",
+    "Microsoft.VisualStudio.Editor/17.0.491": {
+      "sha512": "FyXG/2silaszHliolxRZqR+Sr2kveLCk7Vq8uwo+ThQ2xsGzQvr+I7RAyxQ11EiXOgKpKGqsD+IxLqkntWNbrg==",
       "type": "package",
-      "path": "microsoft.visualstudio.editor/17.0.487",
+      "path": "microsoft.visualstudio.editor/17.0.491",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4291,7 +4291,7 @@
         "PackageIcon.png",
         "lib/net472/Microsoft.VisualStudio.Editor.dll",
         "lib/net472/Microsoft.VisualStudio.Editor.xml",
-        "microsoft.visualstudio.editor.17.0.487.nupkg.sha512",
+        "microsoft.visualstudio.editor.17.0.491.nupkg.sha512",
         "microsoft.visualstudio.editor.nuspec"
       ]
     },
@@ -4405,10 +4405,10 @@
         "microsoft.visualstudio.language.nuspec"
       ]
     },
-    "Microsoft.VisualStudio.Language.Intellisense/17.0.487": {
-      "sha512": "iPi01Ep2YM4rgL6z26s4eEy8hOYwt5jE1aLebknCnBzUAB3avrSVa1AcOo726SdVN8h/h0lVRE4LMrC4WAQ4rQ==",
+    "Microsoft.VisualStudio.Language.Intellisense/17.0.491": {
+      "sha512": "rTTdQf4dI8EqTr9xkgFJn/aL5UVHHDhQUw0MtDCj9sA0tnCP93/G7aye8RIHjsfuauY27WG7wkO1l2yMoBixPA==",
       "type": "package",
-      "path": "microsoft.visualstudio.language.intellisense/17.0.487",
+      "path": "microsoft.visualstudio.language.intellisense/17.0.491",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4416,7 +4416,7 @@
         "PackageIcon.png",
         "lib/net472/Microsoft.VisualStudio.Language.Intellisense.dll",
         "lib/net472/Microsoft.VisualStudio.Language.Intellisense.xml",
-        "microsoft.visualstudio.language.intellisense.17.0.487.nupkg.sha512",
+        "microsoft.visualstudio.language.intellisense.17.0.491.nupkg.sha512",
         "microsoft.visualstudio.language.intellisense.nuspec"
       ]
     },
@@ -4848,10 +4848,10 @@
         "microsoft.visualstudio.text.data.nuspec"
       ]
     },
-    "Microsoft.VisualStudio.Text.Logic/17.0.448": {
-      "sha512": "qF/o2B3PFTWul0713fuuHgyuKgzxwm23Zh08eKm6je+7o5ee4VPZBdtpGGUAwWcslX4Lpu+SyBKtEuAE1LY9nQ==",
+    "Microsoft.VisualStudio.Text.Logic/17.0.491": {
+      "sha512": "lixP4/8JbampXzaJIY30+/a0pDjwTBunFjGKdJCFGGh0Mf7A4dQup0/1RX9nHNH320Bu1FTiKQQIERMFJVs18g==",
       "type": "package",
-      "path": "microsoft.visualstudio.text.logic/17.0.448",
+      "path": "microsoft.visualstudio.text.logic/17.0.491",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4861,7 +4861,7 @@
         "lib/net472/Microsoft.VisualStudio.Text.Logic.xml",
         "lib/netstandard2.0/Microsoft.VisualStudio.Text.Logic.dll",
         "lib/netstandard2.0/Microsoft.VisualStudio.Text.Logic.xml",
-        "microsoft.visualstudio.text.logic.17.0.448.nupkg.sha512",
+        "microsoft.visualstudio.text.logic.17.0.491.nupkg.sha512",
         "microsoft.visualstudio.text.logic.nuspec"
       ]
     },
@@ -4882,10 +4882,10 @@
         "microsoft.visualstudio.text.ui.nuspec"
       ]
     },
-    "Microsoft.VisualStudio.Text.UI.Wpf/17.0.487": {
-      "sha512": "Aq+eNxbpBlU8RYsSwh2JM1ZsttVvU7BKgFG6I/356EaY1ZJVz2LhAfjAl6C/A3pmizxgcczQZOIIJsrhcP/OIQ==",
+    "Microsoft.VisualStudio.Text.UI.Wpf/17.0.491": {
+      "sha512": "X4w2rHkDG52IuEMFWTvPG1CjrGFCfJ6zr/BNT2KeKNmt73GIeE/7ww6a8f7TbJ1hRm9MepulhYyaOZFklw/RXg==",
       "type": "package",
-      "path": "microsoft.visualstudio.text.ui.wpf/17.0.487",
+      "path": "microsoft.visualstudio.text.ui.wpf/17.0.491",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4893,7 +4893,7 @@
         "PackageIcon.png",
         "lib/net472/Microsoft.VisualStudio.Text.UI.Wpf.dll",
         "lib/net472/Microsoft.VisualStudio.Text.UI.Wpf.xml",
-        "microsoft.visualstudio.text.ui.wpf.17.0.487.nupkg.sha512",
+        "microsoft.visualstudio.text.ui.wpf.17.0.491.nupkg.sha512",
         "microsoft.visualstudio.text.ui.wpf.nuspec"
       ]
     },
@@ -6680,10 +6680,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Text.Json/6.0.9": {
-      "sha512": "2j16oUgtIzl7Xtk7demG0i/v5aU/ZvULcAnJvPb63U3ZhXJ494UYcxuEj5Fs49i3XDrk5kU/8I+6l9zRCw3cJw==",
+    "System.Text.Json/6.0.10": {
+      "sha512": "NSB0kDipxn2ychp88NXWfFRFlmi1bst/xynOutbnpEfRCT9JZkZ7KOmF/I/hNKo2dILiMGnqblm+j1sggdLB9g==",
       "type": "package",
-      "path": "system.text.json/6.0.9",
+      "path": "system.text.json/6.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -6729,7 +6729,7 @@
         "lib/netcoreapp3.1/System.Text.Json.xml",
         "lib/netstandard2.0/System.Text.Json.dll",
         "lib/netstandard2.0/System.Text.Json.xml",
-        "system.text.json.6.0.9.nupkg.sha512",
+        "system.text.json.6.0.10.nupkg.sha512",
         "system.text.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -7144,21 +7144,21 @@
       "LibGit2Sharp >= 0.27.2",
       "Microsoft.NETFramework.ReferenceAssemblies >= 1.0.3",
       "Microsoft.VSSDK.BuildTools >= 17.0.5232",
-      "Microsoft.VisualStudio.ComponentModelHost >= 17.0.67",
-      "Microsoft.VisualStudio.Editor >= 17.0.67",
-      "Microsoft.VisualStudio.Language.Intellisense >= 17.0.67",
-      "Microsoft.VisualStudio.SDK >= 17.0.31903.59",
-      "Microsoft.VisualStudio.Shell.Framework >= 17.0.31903.59",
-      "Microsoft.VisualStudio.Shell.Interop >= 17.0.31903.59",
-      "Microsoft.VisualStudio.Text.Logic >= 17.0.67",
-      "Microsoft.VisualStudio.Text.UI.Wpf >= 17.0.67",
+      "Microsoft.VisualStudio.ComponentModelHost >= 17.0.491",
+      "Microsoft.VisualStudio.Editor >= 17.0.491",
+      "Microsoft.VisualStudio.Language.Intellisense >= 17.0.491",
+      "Microsoft.VisualStudio.SDK >= 17.0.32112.339",
+      "Microsoft.VisualStudio.Shell.Framework >= 17.0.32112.339",
+      "Microsoft.VisualStudio.Shell.Interop >= 17.0.32112.339",
+      "Microsoft.VisualStudio.Text.Logic >= 17.0.491",
+      "Microsoft.VisualStudio.Text.UI.Wpf >= 17.0.491",
       "Microsoft.VisualStudio.Threading >= 17.0.64",
-      "Microsoft.VisualStudio.Utilities >= 17.0.31903.59",
+      "Microsoft.VisualStudio.Utilities >= 17.0.32112.339",
       "Microsoft.VisualStudio.Validation >= 17.0.58",
       "Newtonsoft.Json >= 13.0.3",
       "OpenAI >= 1.11.0",
       "System.ComponentModel.Composition >= 4.7.0",
-      "System.Text.Json >= 6.0.9"
+      "System.Text.Json >= 6.0.10"
     ]
   },
   "packageFolders": {
@@ -7221,35 +7221,35 @@
           },
           "Microsoft.VisualStudio.ComponentModelHost": {
             "target": "Package",
-            "version": "[17.0.67, )"
+            "version": "[17.0.491, )"
           },
           "Microsoft.VisualStudio.Editor": {
             "target": "Package",
-            "version": "[17.0.67, )"
+            "version": "[17.0.491, )"
           },
           "Microsoft.VisualStudio.Language.Intellisense": {
             "target": "Package",
-            "version": "[17.0.67, )"
+            "version": "[17.0.491, )"
           },
           "Microsoft.VisualStudio.SDK": {
             "target": "Package",
-            "version": "[17.0.31903.59, )"
+            "version": "[17.0.32112.339, )"
           },
           "Microsoft.VisualStudio.Shell.Framework": {
             "target": "Package",
-            "version": "[17.0.31903.59, )"
+            "version": "[17.0.32112.339, )"
           },
           "Microsoft.VisualStudio.Shell.Interop": {
             "target": "Package",
-            "version": "[17.0.31903.59, )"
+            "version": "[17.0.32112.339, )"
           },
           "Microsoft.VisualStudio.Text.Logic": {
             "target": "Package",
-            "version": "[17.0.67, )"
+            "version": "[17.0.491, )"
           },
           "Microsoft.VisualStudio.Text.UI.Wpf": {
             "target": "Package",
-            "version": "[17.0.67, )"
+            "version": "[17.0.491, )"
           },
           "Microsoft.VisualStudio.Threading": {
             "target": "Package",
@@ -7257,7 +7257,7 @@
           },
           "Microsoft.VisualStudio.Utilities": {
             "target": "Package",
-            "version": "[17.0.31903.59, )"
+            "version": "[17.0.32112.339, )"
           },
           "Microsoft.VisualStudio.Validation": {
             "target": "Package",
@@ -7277,149 +7277,11 @@
           },
           "System.Text.Json": {
             "target": "Package",
-            "version": "[6.0.9, )"
+            "version": "[6.0.10, )"
           }
         },
         "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.ComponentModelHost (>= 17.0.67) but Microsoft.VisualStudio.ComponentModelHost 17.0.67 was not found. Microsoft.VisualStudio.ComponentModelHost 17.0.487 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.ComponentModelHost",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Editor (>= 17.0.67) but Microsoft.VisualStudio.Editor 17.0.67 was not found. Microsoft.VisualStudio.Editor 17.0.487 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Editor",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Language.Intellisense (>= 17.0.67) but Microsoft.VisualStudio.Language.Intellisense 17.0.67 was not found. Microsoft.VisualStudio.Language.Intellisense 17.0.487 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Language.Intellisense",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.SDK (>= 17.0.31903.59) but Microsoft.VisualStudio.SDK 17.0.31903.59 was not found. Microsoft.VisualStudio.SDK 17.0.32112.339 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.SDK",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Shell.Framework (>= 17.0.31903.59) but Microsoft.VisualStudio.Shell.Framework 17.0.31903.59 was not found. Microsoft.VisualStudio.Shell.Framework 17.0.32112.339 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Shell.Framework",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Shell.Interop (>= 17.0.31903.59) but Microsoft.VisualStudio.Shell.Interop 17.0.31903.59 was not found. Microsoft.VisualStudio.Shell.Interop 17.0.32112.339 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Shell.Interop",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Text.Logic (>= 17.0.67) but Microsoft.VisualStudio.Text.Logic 17.0.67 was not found. Microsoft.VisualStudio.Text.Logic 17.0.448 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Text.Logic",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Text.UI.Wpf (>= 17.0.67) but Microsoft.VisualStudio.Text.UI.Wpf 17.0.67 was not found. Microsoft.VisualStudio.Text.UI.Wpf 17.0.487 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Text.UI.Wpf",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "AiderVSExtension depends on Microsoft.VisualStudio.Utilities (>= 17.0.31903.59) but Microsoft.VisualStudio.Utilities 17.0.31903.59 was not found. Microsoft.VisualStudio.Utilities 17.0.32112.339 was resolved instead.",
-      "libraryId": "Microsoft.VisualStudio.Utilities",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1903",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'System.Text.Json' 6.0.9 has a known high severity vulnerability, https://github.com/advisories/GHSA-8g4q-xg66-9fp4",
-      "libraryId": "System.Text.Json",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.VisualStudio.ComponentModelHost from 17.0.491 to 17.0.487. Reference the package directly from the project to select a different version. \n AiderVSExtension -> Microsoft.VisualStudio.SDK 17.0.32112.339 -> Microsoft.VisualStudio.ComponentModelHost (>= 17.0.491) \n AiderVSExtension -> Microsoft.VisualStudio.ComponentModelHost (>= 17.0.67)",
-      "libraryId": "Microsoft.VisualStudio.ComponentModelHost",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.VisualStudio.Editor from 17.0.491 to 17.0.487. Reference the package directly from the project to select a different version. \n AiderVSExtension -> Microsoft.VisualStudio.SDK 17.0.32112.339 -> Microsoft.VisualStudio.Editor (>= 17.0.491) \n AiderVSExtension -> Microsoft.VisualStudio.Editor (>= 17.0.67)",
-      "libraryId": "Microsoft.VisualStudio.Editor",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.VisualStudio.Language.Intellisense from 17.0.491 to 17.0.487. Reference the package directly from the project to select a different version. \n AiderVSExtension -> Microsoft.VisualStudio.SDK 17.0.32112.339 -> Microsoft.VisualStudio.Language.Intellisense (>= 17.0.491) \n AiderVSExtension -> Microsoft.VisualStudio.Language.Intellisense (>= 17.0.67)",
-      "libraryId": "Microsoft.VisualStudio.Language.Intellisense",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.VisualStudio.Text.Logic from 17.0.491 to 17.0.448. Reference the package directly from the project to select a different version. \n AiderVSExtension -> Microsoft.VisualStudio.SDK 17.0.32112.339 -> Microsoft.VisualStudio.Text.Logic (>= 17.0.491) \n AiderVSExtension -> Microsoft.VisualStudio.Text.Logic (>= 17.0.67)",
-      "libraryId": "Microsoft.VisualStudio.Text.Logic",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.7.2"
-      ]
-    }
-  ]
+  }
 }

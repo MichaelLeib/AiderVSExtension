@@ -44,7 +44,7 @@ namespace AiderVSExtension.Models
         /// <param name="value">String value to validate</param>
         /// <param name="fieldName">Name of the field being validated</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateRequired(string? value, string fieldName)
+        public static string ValidateRequired(string value, string fieldName)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -61,18 +61,18 @@ namespace AiderVSExtension.Models
         /// <param name="minLength">Minimum length (optional)</param>
         /// <param name="maxLength">Maximum length (optional)</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateStringLength(string? value, string fieldName, int? minLength = null, int? maxLength = null)
+        public static string ValidateStringLength(string value, string fieldName, int minLength = -1, int maxLength = -1)
         {
             if (value == null) return null;
 
-            if (minLength.HasValue && value.Length < minLength.Value)
+            if (minLength != -1 && value.Length < minLength)
             {
-                return $"{fieldName} must be at least {minLength.Value} characters long";
+                return $"{fieldName} must be at least {minLength} characters long";
             }
 
-            if (maxLength.HasValue && value.Length > maxLength.Value)
+            if (maxLength != -1 && value.Length > maxLength)
             {
-                return $"{fieldName} cannot exceed {maxLength.Value} characters";
+                return $"{fieldName} cannot exceed {maxLength} characters";
             }
 
             return null;
@@ -86,16 +86,16 @@ namespace AiderVSExtension.Models
         /// <param name="min">Minimum value (optional)</param>
         /// <param name="max">Maximum value (optional)</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateRange(int value, string fieldName, int? min = null, int? max = null)
+        public static string ValidateRange(int value, string fieldName, int min = int.MinValue, int max = int.MaxValue)
         {
-            if (min.HasValue && value < min.Value)
+            if (min != int.MinValue && value < min)
             {
-                return $"{fieldName} must be at least {min.Value}";
+                return $"{fieldName} must be at least {min}";
             }
 
-            if (max.HasValue && value > max.Value)
+            if (max != int.MaxValue && value > max)
             {
-                return $"{fieldName} cannot exceed {max.Value}";
+                return $"{fieldName} cannot exceed {max}";
             }
 
             return null;
@@ -108,7 +108,7 @@ namespace AiderVSExtension.Models
         /// <param name="fieldName">Name of the field being validated</param>
         /// <param name="requireHttps">Whether HTTPS is required</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateUrl(string? url, string fieldName, bool requireHttps = false)
+        public static string ValidateUrl(string url, string fieldName, bool requireHttps = false)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -141,7 +141,7 @@ namespace AiderVSExtension.Models
         /// <param name="mustExist">Whether the file must exist</param>
         /// <param name="allowedExtensions">List of allowed file extensions (null for any)</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateFilePath(string? filePath, string fieldName, bool mustExist = false, string[]? allowedExtensions = null)
+        public static string ValidateFilePath(string filePath, string fieldName, bool mustExist = false, string[] allowedExtensions = null)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -256,7 +256,7 @@ namespace AiderVSExtension.Models
         /// <param name="fieldName">Name of the field being validated</param>
         /// <param name="mustExist">Whether the directory must exist</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateDirectoryPath(string? directoryPath, string fieldName, bool mustExist = false)
+        public static string ValidateDirectoryPath(string directoryPath, string fieldName, bool mustExist = false)
         {
             if (string.IsNullOrWhiteSpace(directoryPath))
             {
@@ -326,7 +326,7 @@ namespace AiderVSExtension.Models
         /// <param name="fieldName">Name of the field being validated</param>
         /// <param name="provider">AI provider type for provider-specific validation</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateApiKey(string? apiKey, string fieldName, AIProvider provider)
+        public static string ValidateApiKey(string apiKey, string fieldName, AIProvider provider)
         {
             if (string.IsNullOrWhiteSpace(apiKey))
             {
@@ -373,7 +373,7 @@ namespace AiderVSExtension.Models
         /// <param name="fieldName">Name of the field being validated</param>
         /// <param name="allowFuture">Whether future timestamps are allowed</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateTimestamp(DateTime timestamp, string fieldName, bool allowFuture = false)
+        public static string ValidateTimestamp(DateTime timestamp, string fieldName, bool allowFuture = false)
         {
             if (timestamp == default)
             {
@@ -404,7 +404,7 @@ namespace AiderVSExtension.Models
         /// <param name="fieldName">Name of the field being validated</param>
         /// <param name="provider">AI provider type</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateModelName(string? modelName, string fieldName, AIProvider provider)
+        public static string ValidateModelName(string modelName, string fieldName, AIProvider provider)
         {
             if (string.IsNullOrWhiteSpace(modelName))
             {
@@ -462,7 +462,7 @@ namespace AiderVSExtension.Models
         /// <param name="maxItems">Maximum number of items allowed</param>
         /// <returns>List of validation error messages</returns>
         public static List<string> ValidateCollection<T>(IEnumerable<T>? collection, string fieldName, 
-            Func<T, int, List<string>> validator, int? maxItems = null)
+            Func<T, int, List<string>> validator, int maxItems = -1)
         {
             var errors = new List<string>();
 
@@ -496,7 +496,7 @@ namespace AiderVSExtension.Models
         /// <param name="guid">GUID to validate</param>
         /// <param name="fieldName">Name of the field being validated</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateGuid(Guid guid, string fieldName)
+        public static string ValidateGuid(Guid guid, string fieldName)
         {
             if (guid == Guid.Empty)
             {
@@ -511,7 +511,7 @@ namespace AiderVSExtension.Models
         /// <param name="guidString">String to validate as GUID</param>
         /// <param name="fieldName">Name of the field being validated</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateGuidString(string? guidString, string fieldName)
+        public static string ValidateGuidString(string guidString, string fieldName)
         {
             if (string.IsNullOrWhiteSpace(guidString))
             {
@@ -607,7 +607,7 @@ namespace AiderVSExtension.Models
         /// <param name="content">Content to validate</param>
         /// <param name="fieldName">Name of the field being validated</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateContentForXSS(string? content, string fieldName)
+        public static string ValidateContentForXSS(string content, string fieldName)
         {
             if (string.IsNullOrEmpty(content))
             {
@@ -639,7 +639,7 @@ namespace AiderVSExtension.Models
         /// <param name="input">User input to validate</param>
         /// <param name="fieldName">Name of the field being validated</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateAgainstCommandInjection(string? input, string fieldName)
+        public static string ValidateAgainstCommandInjection(string input, string fieldName)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -690,7 +690,7 @@ namespace AiderVSExtension.Models
         /// <param name="input">User input to validate</param>
         /// <param name="fieldName">Name of the field being validated</param>
         /// <returns>Validation error message, or null if valid</returns>
-        public static string? ValidateAgainstSQLInjection(string? input, string fieldName)
+        public static string ValidateAgainstSQLInjection(string input, string fieldName)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -739,7 +739,7 @@ namespace AiderVSExtension.Models
         /// <param name="fieldName">Name of the field being validated</param>
         /// <param name="allowHtml">Whether HTML content is allowed</param>
         /// <returns>List of validation error messages</returns>
-        public static List<string> ValidateUserInput(string? input, string fieldName, bool allowHtml = false)
+        public static List<string> ValidateUserInput(string input, string fieldName, bool allowHtml = false)
         {
             var errors = new List<string>();
 

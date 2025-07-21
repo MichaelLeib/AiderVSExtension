@@ -36,7 +36,7 @@ namespace AiderVSExtension.Models
         /// Context from the current file or selection
         /// </summary>
         [JsonPropertyName("context")]
-        public string? Context { get; set; }
+        public string Context { get; set; }
 
         /// <summary>
         /// File references for additional context
@@ -48,7 +48,7 @@ namespace AiderVSExtension.Models
         /// Language of the code being completed
         /// </summary>
         [JsonPropertyName("language")]
-        public string? Language { get; set; }
+        public string Language { get; set; }
 
         /// <summary>
         /// Timestamp when the request was created

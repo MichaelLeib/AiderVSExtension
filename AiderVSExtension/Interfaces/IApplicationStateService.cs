@@ -66,7 +66,7 @@ namespace AiderVSExtension.Interfaces
         /// <summary>
         /// Gets the path of the currently open solution
         /// </summary>
-        string? CurrentSolutionPath { get; }
+        string CurrentSolutionPath { get; }
 
         /// <summary>
         /// Initializes the application state service
@@ -137,7 +137,7 @@ namespace AiderVSExtension.Interfaces
         public DateTime CompletedTime { get; set; }
         public TimeSpan InitializationDuration { get; set; }
         public bool IsSuccessful { get; set; }
-        public string? ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     /// <summary>

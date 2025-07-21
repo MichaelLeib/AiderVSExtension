@@ -16,21 +16,21 @@ namespace AiderVSExtension.Services
         private readonly object _lockObject = new object();
         
         private bool _disposed = false;
-        private Conversation? _currentConversation;
-        private string? _activeConversationId;
+        private Conversation _currentConversation;
+        private string _activeConversationId;
         private DateTime _sessionStartTime;
         private bool _isSessionActive = false;
 
         // Events
-        public event EventHandler<SessionStartedEventArgs>? SessionStarted;
-        public event EventHandler<SessionEndedEventArgs>? SessionEnded;
-        public event EventHandler<ConversationChangedEventArgs>? ConversationChanged;
-        public event EventHandler<SessionErrorEventArgs>? SessionError;
+        public event EventHandler<SessionStartedEventArgs> SessionStarted;
+        public event EventHandler<SessionEndedEventArgs> SessionEnded;
+        public event EventHandler<ConversationChangedEventArgs> ConversationChanged;
+        public event EventHandler<SessionErrorEventArgs> SessionError;
 
         // Properties
         public bool IsSessionActive => _isSessionActive;
-        public Conversation? CurrentConversation => _currentConversation;
-        public string? ActiveConversationId => _activeConversationId;
+        public Conversation CurrentConversation => _currentConversation;
+        public string ActiveConversationId => _activeConversationId;
         public DateTime SessionStartTime => _sessionStartTime;
         public TimeSpan SessionDuration => _isSessionActive ? DateTime.UtcNow - _sessionStartTime : TimeSpan.Zero;
 
@@ -144,7 +144,7 @@ namespace AiderVSExtension.Services
         /// </summary>
         /// <param name="title">Optional title for the conversation</param>
         /// <returns>The created conversation</returns>
-        public async Task<Conversation> CreateNewConversationAsync(string? title = null)
+        public async Task<Conversation> CreateNewConversationAsync(string title = null)
         {
             try
             {
@@ -184,7 +184,7 @@ namespace AiderVSExtension.Services
         /// </summary>
         /// <param name="conversationId">The ID of the conversation to load</param>
         /// <returns>The loaded conversation, or null if not found</returns>
-        public async Task<Conversation?> LoadConversationAsync(string conversationId)
+        public async Task<Conversation> LoadConversationAsync(string conversationId)
         {
             if (string.IsNullOrWhiteSpace(conversationId))
                 throw new ArgumentException("Conversation ID cannot be null or empty", nameof(conversationId));
@@ -446,7 +446,7 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Handles extension initialized event
         /// </summary>
-        private async void OnExtensionInitialized(object? sender, ExtensionInitializedEventArgs e)
+        private async void OnExtensionInitialized(object sender, ExtensionInitializedEventArgs e)
         {
             if (e.IsSuccessfulful)
             {
@@ -464,7 +464,7 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Handles extension shutting down event
         /// </summary>
-        private async void OnExtensionShuttingDown(object? sender, ExtensionShuttingDownEventArgs e)
+        private async void OnExtensionShuttingDown(object sender, ExtensionShuttingDownEventArgs e)
         {
             try
             {
@@ -479,7 +479,7 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Handles solution opened event
         /// </summary>
-        private async void OnSolutionOpened(object? sender, SolutionOpenedEventArgs e)
+        private async void OnSolutionOpened(object sender, SolutionOpenedEventArgs e)
         {
             try
             {
@@ -498,7 +498,7 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Handles solution closed event
         /// </summary>
-        private async void OnSolutionClosed(object? sender, SolutionClosedEventArgs e)
+        private async void OnSolutionClosed(object sender, SolutionClosedEventArgs e)
         {
             try
             {
@@ -579,7 +579,7 @@ namespace AiderVSExtension.Services
     public class SessionStartedEventArgs : EventArgs
     {
         public DateTime StartTime { get; set; }
-        public string? RestoredConversationId { get; set; }
+        public string RestoredConversationId { get; set; }
     }
 
     /// <summary>
@@ -589,7 +589,7 @@ namespace AiderVSExtension.Services
     {
         public DateTime EndTime { get; set; }
         public TimeSpan Duration { get; set; }
-        public string? ConversationId { get; set; }
+        public string ConversationId { get; set; }
         public int MessageCount { get; set; }
     }
 
@@ -598,8 +598,8 @@ namespace AiderVSExtension.Services
     /// </summary>
     public class ConversationChangedEventArgs : EventArgs
     {
-        public string? OldConversationId { get; set; }
-        public string? NewConversationId { get; set; }
+        public string OldConversationId { get; set; }
+        public string NewConversationId { get; set; }
         public DateTime ChangedAt { get; set; }
     }
 
@@ -610,6 +610,6 @@ namespace AiderVSExtension.Services
     {
         public string ErrorMessage { get; set; } = string.Empty;
         public string Context { get; set; } = string.Empty;
-        public Exception? Exception { get; set; }
+        public Exception Exception { get; set; }
     }
 }

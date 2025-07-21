@@ -78,7 +78,7 @@ namespace AiderVSExtension.Interfaces
         /// <summary>
         /// Gets or sets the expiration time for the credential
         /// </summary>
-        public DateTime? ExpiresAt { get; set; }
+        public DateTime ExpiresAt { get; set; }
 
         /// <summary>
         /// Gets or sets whether the credential should persist across sessions

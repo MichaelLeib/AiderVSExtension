@@ -461,7 +461,7 @@ namespace AiderVSExtension.Models
         /// <param name="validator">Validator function for individual items</param>
         /// <param name="maxItems">Maximum number of items allowed</param>
         /// <returns>List of validation error messages</returns>
-        public static List<string> ValidateCollection<T>(IEnumerable<T>? collection, string fieldName, 
+        public static List<string> ValidateCollection<T>(IEnumerable<T> collection, string fieldName, 
             Func<T, int, List<string>> validator, int maxItems = -1)
         {
             var errors = new List<string>();

@@ -6862,7 +6862,7 @@
       "Microsoft.VisualStudio.Validation >= 17.0.58",
       "Newtonsoft.Json >= 13.0.3",
       "System.ComponentModel.Composition >= 4.7.0",
-      "System.ComponentModel.DataAnnotations >= 4.7.0",
+      "System.ComponentModel.DataAnnotations >= 5.0.0",
       "System.Text.Json >= 6.0.10"
     ]
   },
@@ -6978,7 +6978,7 @@
           },
           "System.ComponentModel.DataAnnotations": {
             "target": "Package",
-            "version": "[4.7.0, )"
+            "version": "[5.0.0, )"
           },
           "System.Text.Json": {
             "target": "Package",

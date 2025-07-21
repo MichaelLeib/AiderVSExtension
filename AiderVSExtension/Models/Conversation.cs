@@ -79,13 +79,13 @@ namespace AiderVSExtension.Models
         /// Gets the last message in the conversation
         /// </summary>
         [JsonIgnore]
-        public ChatMessage? LastMessage => Messages?.LastOrDefault();
+        public ChatMessage LastMessage => Messages?.LastOrDefault();
 
         /// <summary>
         /// Gets the first message in the conversation
         /// </summary>
         [JsonIgnore]
-        public ChatMessage? FirstMessage => Messages?.FirstOrDefault();
+        public ChatMessage FirstMessage => Messages?.FirstOrDefault();
 
         /// <summary>
         /// Gets the estimated total token count for the conversation

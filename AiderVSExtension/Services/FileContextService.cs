@@ -34,7 +34,7 @@ namespace AiderVSExtension.Services
         private readonly Dictionary<string, FileSystemWatcher> _fileWatchers;
         private readonly object _cacheLock = new object();
         private readonly object _watcherLock = new object();
-        private readonly Timer _cacheCleanupTimer;
+        private readonly System.Threading.Timer _cacheCleanupTimer;
 
         // Memory optimization constants
         private const int MAX_CACHE_FILES = 100;
@@ -59,7 +59,7 @@ namespace AiderVSExtension.Services
             _fileWatchers = new Dictionary<string, FileSystemWatcher>();
             
             // Initialize cache cleanup timer
-            _cacheCleanupTimer = new Timer(CleanupCache, null,
+            _cacheCleanupTimer = new System.Threading.Timer(CleanupCache, null,
                 TimeSpan.FromMinutes(CACHE_CLEANUP_INTERVAL_MINUTES),
                 TimeSpan.FromMinutes(CACHE_CLEANUP_INTERVAL_MINUTES));
         }

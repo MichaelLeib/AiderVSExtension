@@ -6862,6 +6862,7 @@
       "Microsoft.VisualStudio.Validation >= 17.0.58",
       "Newtonsoft.Json >= 13.0.3",
       "System.ComponentModel.Composition >= 4.7.0",
+      "System.ComponentModel.DataAnnotations >= 4.7.0",
       "System.Text.Json >= 6.0.10"
     ]
   },
@@ -6975,6 +6976,10 @@
             "target": "Package",
             "version": "[4.7.0, )"
           },
+          "System.ComponentModel.DataAnnotations": {
+            "target": "Package",
+            "version": "[4.7.0, )"
+          },
           "System.Text.Json": {
             "target": "Package",
             "version": "[6.0.10, )"
@@ -6983,5 +6988,16 @@
         "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Unable to find package System.ComponentModel.DataAnnotations. No packages exist with this id in source(s): /opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs, nuget.org",
+      "libraryId": "System.ComponentModel.DataAnnotations",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.7.2"
+      ]
+    }
+  ]
 }

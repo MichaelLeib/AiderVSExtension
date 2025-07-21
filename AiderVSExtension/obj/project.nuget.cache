@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "1TArE3YF7NA=",
-  "success": true,
+  "dgSpecHash": "mg1RxRCCmrQ=",
+  "success": false,
   "projectFilePath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj",
   "expectedPackageFiles": [
     "/Users/michaelleib/.nuget/packages/envdte/17.0.32112.339/envdte.17.0.32112.339.nupkg.sha512",
@@ -137,5 +137,15 @@
     "/Users/michaelleib/.nuget/packages/vslangproj80/17.0.32112.339/vslangproj80.17.0.32112.339.nupkg.sha512",
     "/Users/michaelleib/.nuget/packages/vslangproj90/17.0.32112.339/vslangproj90.17.0.32112.339.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Unable to find package System.ComponentModel.DataAnnotations. No packages exist with this id in source(s): /opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs, nuget.org",
+      "libraryId": "System.ComponentModel.DataAnnotations",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.7.2"
+      ]
+    }
+  ]
 }

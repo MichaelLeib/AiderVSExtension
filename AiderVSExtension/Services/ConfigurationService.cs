@@ -21,11 +21,11 @@ namespace AiderVSExtension.Services
     public class ConfigurationService : IConfigurationService, IDisposable
     {
         private readonly WritableSettingsStore _settingsStore;
-        private AIModelConfiguration? _cachedConfiguration;
+        private AIModelConfiguration _cachedConfiguration;
         private readonly object _lockObject = new object();
 
         // Event for configuration changes
-        public event EventHandler<ConfigurationChangedEventArgs>? ConfigurationChanged;
+        public event EventHandler<ConfigurationChangedEventArgs> ConfigurationChanged;
 
         public ConfigurationService(WritableSettingsStore settingsStore)
         {

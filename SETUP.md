@@ -75,6 +75,8 @@ Before starting, ensure you have:
    git clone https://github.com/your-repo/Aider-VS.git
    cd Aider-VS
    ```
+   
+   *Note: Replace `https://github.com/your-repo/Aider-VS.git` with the actual repository URL*
 
 ## Step 6: Build the Extension
 
@@ -83,8 +85,10 @@ Before starting, ensure you have:
 
 2. **Open the Solution**
    - File → Open → Project/Solution
-   - Navigate to `C:\Development\Aider-VS`
+   - Navigate to your cloned directory (e.g., `C:\Development\Aider-VS`)
    - Select `AiderVSExtension.sln`
+   
+   *Note: The solution file (`AiderVSExtension.sln`) should be in the root directory of the cloned repository*
 
 3. **Restore NuGet Packages**
    - Right-click on the solution in Solution Explorer
@@ -102,7 +106,7 @@ Before starting, ensure you have:
 ## Step 7: Install the Extension
 
 1. **Locate the VSIX File**
-   - Navigate to `C:\Development\Aider-VS\AiderVSExtension\bin\Release\`
+   - Navigate to your project directory: `C:\Development\Aider-VS\AiderVSExtension\bin\Release\`
    - Find `AiderVSExtension.vsix`
 
 2. **Install the Extension**

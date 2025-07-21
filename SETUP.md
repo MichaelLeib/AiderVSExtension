@@ -5,9 +5,11 @@ This guide will walk you through setting up the Aider Visual Studio Extension fr
 ## Prerequisites
 
 Before starting, ensure you have:
-- Windows 10/11 (64-bit)
+- **Windows 10/11 (64-bit)** - This extension can ONLY be built on Windows
 - Administrative privileges for software installation
 - Internet connection for downloading dependencies
+
+> ⚠️ **Important**: This is a Visual Studio 2022 extension that uses Windows-specific APIs and SDKs. It cannot be built on macOS or Linux. You must use a Windows machine with Visual Studio 2022 installed.
 
 ## Step 1: Install Visual Studio 2022
 
@@ -178,6 +180,8 @@ Before starting, ensure you have:
 - **Missing .NET Framework**: Install .NET Framework 4.7.2 or later
 - **Missing Visual Studio SDK**: Re-run VS installer and add "Visual Studio extension development"
 - **Package conflicts**: Delete `bin` and `obj` folders, then rebuild
+- **"WindowsDesktop targets not found"**: This means you're trying to build on macOS/Linux - you must use Windows with Visual Studio 2022
+- **NuGet package downgrade warnings**: Clear NuGet cache with `dotnet nuget locals all --clear` and rebuild
 
 ### Extension Not Loading
 - Check Extensions → Manage Extensions → Installed

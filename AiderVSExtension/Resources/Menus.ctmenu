@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidAiderVSExtensionPackage">
+    <!-- Define the menus -->
+    <Menus>
+      <Menu guid="guidAiderVSExtensionPackageCmdSet" id="AiderMainMenu" priority="0x0100" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS"/>
+        <Strings>
+          <ButtonText>Aider</ButtonText>
+          <CommandName>Aider</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidAiderVSExtensionPackageCmdSet" id="AiderToolbar" priority="0x0000" type="Toolbar">
+        <CommandFlag>AlwaysCreate</CommandFlag>
+        <Strings>
+          <ButtonText>Aider</ButtonText>
+          <CommandName>Aider</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidAiderVSExtensionPackageCmdSet" id="EditorContextMenu" priority="0x0100" type="Context">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+        <Strings>
+          <ButtonText>Aider</ButtonText>
+          <CommandName>Aider</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidAiderVSExtensionPackageCmdSet" id="ErrorListContextMenu" priority="0x0100" type="Context">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ERRORLIST"/>
+        <Strings>
+          <ButtonText>Aider</ButtonText>
+          <CommandName>Aider</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
+
+    <!-- Define the groups -->
+    <Groups>
+      <Group guid="guidAiderVSExtensionPackageCmdSet" id="AiderMainMenuGroup" priority="0x0600">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="AiderMainMenu"/>
+      </Group>
+
+      <Group guid="guidAiderVSExtensionPackageCmdSet" id="AiderToolbarGroup" priority="0x0000">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="AiderToolbar"/>
+      </Group>
+
+      <Group guid="guidAiderVSExtensionPackageCmdSet" id="EditorContextMenuGroup" priority="0x0600">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="EditorContextMenu"/>
+      </Group>
+
+      <Group guid="guidAiderVSExtensionPackageCmdSet" id="ErrorListContextMenuGroup" priority="0x0600">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="ErrorListContextMenu"/>
+      </Group>
+    </Groups>
+
+    <!-- Define the buttons -->
+    <Buttons>
+      <Button guid="guidAiderVSExtensionPackageCmdSet" id="OpenChatToolWindowCommand" priority="0x0100" type="Button">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="AiderMainMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic1"/>
+        <Strings>
+          <ButtonText>Open Aider Chat</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidAiderVSExtensionPackageCmdSet" id="AddToAiderChatCommand" priority="0x0100" type="Button">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="EditorContextMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic2"/>
+        <Strings>
+          <ButtonText>Add to Aider Chat</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidAiderVSExtensionPackageCmdSet" id="FixWithAiderCommand" priority="0x0100" type="Button">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="ErrorListContextMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic3"/>
+        <Strings>
+          <ButtonText>Fix with Aider</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidAiderVSExtensionPackageCmdSet" id="OpenSettingsCommand" priority="0x0200" type="Button">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="AiderMainMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic4"/>
+        <Strings>
+          <ButtonText>Aider Settings</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidAiderVSExtensionPackageCmdSet" id="ToggleAICompletionCommand" priority="0x0100" type="Button">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="AiderToolbarGroup"/>
+        <Icon guid="guidImages" id="bmpPic5"/>
+        <Strings>
+          <ButtonText>Toggle AI Completion</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidAiderVSExtensionPackageCmdSet" id="TestAIConnectionCommand" priority="0x0300" type="Button">
+        <Parent guid="guidAiderVSExtensionPackageCmdSet" id="AiderMainMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic6"/>
+        <Strings>
+          <ButtonText>Test AI Connection</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+
+    <!-- Define the bitmaps -->
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="icon.png" usedList="bmpPic1, bmpPic2, bmpPic3, bmpPic4, bmpPic5, bmpPic6"/>
+    </Bitmaps>
+  </Commands>
+
+  <Symbols>
+    <!-- This is the package guid -->
+    <GuidSymbol name="guidAiderVSExtensionPackage" value="{12345678-1234-1234-1234-123456789ABC}"/>
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidAiderVSExtensionPackageCmdSet" value="{12345678-1234-1234-1234-123456789ABE}">
+      <!-- Menu IDs -->
+      <IDSymbol name="AiderMainMenu" value="0x1050"/>
+      <IDSymbol name="AiderToolbar" value="0x1051"/>
+      <IDSymbol name="EditorContextMenu" value="0x1052"/>
+      <IDSymbol name="ErrorListContextMenu" value="0x1053"/>
+
+      <!-- Group IDs -->
+      <IDSymbol name="AiderMainMenuGroup" value="0x1020"/>
+      <IDSymbol name="AiderToolbarGroup" value="0x1021"/>
+      <IDSymbol name="EditorContextMenuGroup" value="0x1022"/>
+      <IDSymbol name="ErrorListContextMenuGroup" value="0x1023"/>
+
+      <!-- Command IDs -->
+      <IDSymbol name="OpenChatToolWindowCommand" value="0x0100"/>
+      <IDSymbol name="AddToAiderChatCommand" value="0x0101"/>
+      <IDSymbol name="FixWithAiderCommand" value="0x0102"/>
+      <IDSymbol name="OpenSettingsCommand" value="0x0106"/>
+      <IDSymbol name="ToggleAICompletionCommand" value="0x0104"/>
+      <IDSymbol name="TestAIConnectionCommand" value="0x0111"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{12345678-1234-1234-1234-123456789AC4}">
+      <IDSymbol name="bmpPic1" value="1"/>
+      <IDSymbol name="bmpPic2" value="2"/>
+      <IDSymbol name="bmpPic3" value="3"/>
+      <IDSymbol name="bmpPic4" value="4"/>
+      <IDSymbol name="bmpPic5" value="5"/>
+      <IDSymbol name="bmpPic6" value="6"/>
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

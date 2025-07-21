@@ -1,0 +1,1368 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using AiderVSExtension.Exceptions;
+using AiderVSExtension.Interfaces;
+using AiderVSExtension.Models;
+
+namespace AiderVSExtension.Services
+{
+    /// <summary>
+    /// Core service for communicating with the Aider AI backend
+    /// </summary>
+    public class AiderService : IAiderService, IDisposable
+    {
+        private readonly IErrorHandler _errorHandler;
+        private readonly IConfigurationService _configurationService;
+        private readonly RetryPolicy _retryPolicy;
+        private readonly IMessageQueue _messageQueue;
+        private readonly SessionManager _sessionManager;
+        
+        private ClientWebSocket _webSocket;
+        private AiderHttpClient _httpClient;
+        private CancellationTokenSource _cancellationTokenSource;
+        private readonly SemaphoreSlim _connectionSemaphore;
+        private readonly List<ChatMessage> _chatHistory;
+        private readonly object _chatHistoryLock = new object();
+        
+        private bool _isConnected;
+        private bool _isDisposed;
+        private Task _messageProcessingTask;
+        private Task _connectionMonitorTask;
+        private Task _heartbeatTask;
+        private Task _realTimeUpdatesTask;
+        
+        // Connection state tracking
+        private DateTime _lastConnectionAttempt;
+        private int _consecutiveFailures;
+        private readonly object _connectionStateLock = new object();
+        
+        // Configuration
+        private string _aiderEndpoint = "ws://localhost:8765"; // Default WebSocket endpoint
+        private string _httpEndpoint = "http://localhost:8766"; // Default HTTP endpoint
+        private int _maxRetryAttempts = 3;
+        private TimeSpan _retryDelay = TimeSpan.FromSeconds(2);
+        private TimeSpan _connectionTimeout = TimeSpan.FromSeconds(30);
+        private TimeSpan _messageTimeout = TimeSpan.FromSeconds(60);
+        private TimeSpan _heartbeatInterval = TimeSpan.FromSeconds(30);
+        private TimeSpan _reconnectDelay = TimeSpan.FromSeconds(5);
+        private int _maxConsecutiveFailures = 5;
+
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<ConnectionStatusChangedEventArgs> ConnectionStatusChanged;
+        public event EventHandler<MessageSentEventArgs> MessageSent;
+        public event EventHandler<SessionEventArgs> SessionEvent;
+
+        public bool IsConnected => _isConnected && _webSocket?.State == WebSocketState.Open;
+        public int ConsecutiveFailures => _consecutiveFailures;
+        public DateTime LastConnectionAttempt => _lastConnectionAttempt;
+
+        public AiderService(IErrorHandler errorHandler, IConfigurationService configurationService,
+            IMessageQueue messageQueue, SessionManager sessionManager, RetryPolicy retryPolicy = null)
+        {
+            _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
+            _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
+            _messageQueue = messageQueue ?? throw new ArgumentNullException(nameof(messageQueue));
+            _sessionManager = sessionManager ?? throw new ArgumentNullException(nameof(sessionManager));
+            _retryPolicy = retryPolicy ?? new RetryPolicy(errorHandler);
+            
+            _connectionSemaphore = new SemaphoreSlim(1, 1);
+            _chatHistory = new List<ChatMessage>();
+            
+            LoadConfiguration();
+            
+            // Initialize HTTP client after configuration is loaded
+            _httpClient = new AiderHttpClient(_httpEndpoint, _errorHandler, _retryPolicy);
+            
+            // Subscribe to session manager events
+            _sessionManager.SessionStarted += OnSessionStarted;
+            _sessionManager.SessionEnded += OnSessionEnded;
+            _sessionManager.ConversationChanged += OnConversationChanged;
+            _sessionManager.SessionError += OnSessionError;
+        }
+
+        public async Task InitializeAsync()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            try
+            {
+                await _errorHandler.LogInfoAsync("Initializing Aider service", "AiderService.InitializeAsync");
+                
+                // Load configuration
+                await _errorHandler.LogInfoAsync("Loading configuration", "AiderService.InitializeAsync");
+                LoadConfiguration();
+                await _errorHandler.LogInfoAsync($"Configuration loaded - Endpoint: {_aiderEndpoint}, Timeout: {_connectionTimeout.TotalSeconds}s", "AiderService.InitializeAsync");
+                
+                // Start connection
+                await _errorHandler.LogInfoAsync("Establishing connection to Aider backend", "AiderService.InitializeAsync");
+                await ConnectAsync();
+                
+                // Start background tasks
+                await _errorHandler.LogInfoAsync("Starting background tasks", "AiderService.InitializeAsync");
+                _cancellationTokenSource = new CancellationTokenSource();
+                _messageProcessingTask = ProcessMessageQueueAsync(_cancellationTokenSource.Token);
+                _connectionMonitorTask = MonitorConnectionAsync(_cancellationTokenSource.Token);
+                
+                stopwatch.Stop();
+                await _errorHandler.LogInfoAsync($"Aider service initialized successfully in {stopwatch.ElapsedMilliseconds}ms", "AiderService.InitializeAsync");
+                
+                // Log initial statistics
+                await LogServiceStatistics("Service Initialized");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                await _errorHandler.LogErrorAsync($"Failed to initialize Aider service after {stopwatch.ElapsedMilliseconds}ms", "AiderService.InitializeAsync");
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.InitializeAsync");
+                throw new AiderServiceException("Failed to initialize Aider service", ex);
+            }
+        }
+
+        public async Task SendMessageAsync(string message, IEnumerable<FileReference> fileReferences = null)
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            if (string.IsNullOrWhiteSpace(message))
+                throw new ArgumentException("Message cannot be null or empty", nameof(message));
+
+            try
+            {
+                var chatMessage = new ChatMessage
+                {
+                    Content = message,
+                    Type = MessageType.User,
+                    References = fileReferences?.ToList() ?? new List<FileReference>()
+                };
+
+                // Validate message
+                if (!chatMessage.IsValid())
+                {
+                    var errors = chatMessage.GetValidationErrors();
+                    throw new ArgumentException($"Invalid message: {string.Join(", ", errors)}");
+                }
+
+                // Add to session manager's current conversation
+                await _sessionManager.AddMessageToCurrentConversationAsync(chatMessage);
+
+                // Add to local chat history for immediate access
+                lock (_chatHistoryLock)
+                {
+                    _chatHistory.Add(chatMessage);
+                }
+
+                // Queue message for sending with priority
+                await _messageQueue.EnqueueAsync(chatMessage, MessagePriority.Normal);
+                
+                await _errorHandler.LogInfoAsync($"Message queued for sending: {message.Substring(0, Math.Min(50, message.Length))}...", "AiderService.SendMessageAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.SendMessageAsync");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sends a message to Aider AI and returns the response
+        /// </summary>
+        /// <param name="userMessage">The user message to send</param>
+        /// <returns>The response from Aider AI</returns>
+        public async Task<ChatMessage> SendMessageAsync(ChatMessage userMessage)
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            if (userMessage == null)
+                throw new ArgumentNullException(nameof(userMessage));
+
+            try
+            {
+                // Validate message
+                if (!userMessage.IsValid())
+                {
+                    var errors = userMessage.GetValidationErrors();
+                    throw new ArgumentException($"Invalid message: {string.Join(", ", errors)}");
+                }
+
+                // Add to session manager's current conversation
+                await _sessionManager.AddMessageToCurrentConversationAsync(userMessage);
+
+                // Add to local chat history for immediate access
+                lock (_chatHistoryLock)
+                {
+                    _chatHistory.Add(userMessage);
+                }
+
+                // Send message and wait for response
+                var response = await SendMessageAndWaitForResponseAsync(userMessage);
+
+                // Add response to session manager's current conversation and local history
+                if (response != null)
+                {
+                    await _sessionManager.AddMessageToCurrentConversationAsync(response);
+                    
+                    lock (_chatHistoryLock)
+                    {
+                        _chatHistory.Add(response);
+                    }
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.SendMessageAsync");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sends a message and waits for a response from Aider
+        /// </summary>
+        /// <param name="message">The message to send</param>
+        /// <returns>The response from Aider</returns>
+        private async Task<ChatMessage> SendMessageAndWaitForResponseAsync(ChatMessage message)
+        {
+            var responseTaskCompletionSource = new TaskCompletionSource<ChatMessage>();
+            var responseTimeout = TimeSpan.FromSeconds(120); // 2 minute timeout for AI responses
+
+            // Set up a temporary event handler to capture the response
+            EventHandler<MessageReceivedEventArgs> responseHandler = (sender, args) =>
+            {
+                if (args.Message.Type == MessageType.Assistant)
+                {
+                    responseTaskCompletionSource.TrySetResult(args.Message);
+                }
+            };
+
+            try
+            {
+                // Subscribe to message received events
+                MessageReceived += responseHandler;
+
+                // Send the message
+                await SendMessageDirectlyAsync(message);
+
+                // Wait for response with timeout
+                using (var cts = new CancellationTokenSource(responseTimeout))
+                {
+                    cts.Token.Register(() => responseTaskCompletionSource.TrySetCanceled());
+                    return await responseTaskCompletionSource.Task;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Return a timeout response
+                return new ChatMessage
+                {
+                    Content = "Request timed out. Please try again.",
+                    Type = MessageType.System,
+                    Timestamp = DateTime.UtcNow
+                };
+            }
+            finally
+            {
+                // Unsubscribe from the event
+                MessageReceived -= responseHandler;
+            }
+        }
+
+        /// <summary>
+        /// Sends a message directly to the backend without queuing
+        /// </summary>
+        /// <param name="message">The message to send</param>
+        private async Task SendMessageDirectlyAsync(ChatMessage message)
+        {
+            try
+            {
+                if (!IsConnected)
+                {
+                    await ConnectAsync();
+                }
+
+                var messageJson = JsonSerializer.Serialize(message);
+                var messageBytes = Encoding.UTF8.GetBytes(messageJson);
+
+                using (var cts = new CancellationTokenSource(_messageTimeout))
+                {
+                    await _webSocket.SendAsync(
+                        new ArraySegment<byte>(messageBytes),
+                        WebSocketMessageType.Text,
+                        true,
+                        cts.Token);
+                }
+
+                await _errorHandler.LogInfoAsync($"Message sent directly to Aider backend", "AiderService.SendMessageDirectlyAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.SendMessageDirectlyAsync");
+                throw new AiderCommunicationException("Failed to send message to Aider backend", ex);
+            }
+        }
+
+        public async Task<IEnumerable<ChatMessage>> GetChatHistoryAsync()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            try
+            {
+                lock (_chatHistoryLock)
+                {
+                    return _chatHistory.ToList(); // Return a copy
+                }
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.GetChatHistoryAsync");
+                throw;
+            }
+        }
+
+        public async Task ClearChatHistoryAsync()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            try
+            {
+                lock (_chatHistoryLock)
+                {
+                    _chatHistory.Clear();
+                }
+                
+                await _errorHandler.LogInfoAsync("Chat history cleared", "AiderService.ClearChatHistoryAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.ClearChatHistoryAsync");
+                throw;
+            }
+        }
+
+        public async Task SaveConversationAsync()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            try
+            {
+                var conversationData = new ConversationData
+                {
+                    Messages = new List<ChatMessage>(),
+                    SavedAt = DateTime.UtcNow,
+                    Version = "1.0"
+                };
+
+                lock (_chatHistoryLock)
+                {
+                    conversationData.Messages.AddRange(_chatHistory);
+                }
+
+                var conversationJson = JsonSerializer.Serialize(conversationData, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                var conversationPath = GetConversationFilePath();
+                await File.WriteAllTextAsync(conversationPath, conversationJson);
+                
+                await _errorHandler.LogInfoAsync($"Conversation saved to {conversationPath}", "AiderService.SaveConversationAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.SaveConversationAsync");
+                throw new AiderSessionException("Failed to save conversation", ex);
+            }
+        }
+
+        public async Task LoadConversationAsync()
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            try
+            {
+                var conversationPath = GetConversationFilePath();
+                
+                if (!File.Exists(conversationPath))
+                {
+                    await _errorHandler.LogInfoAsync("No saved conversation found", "AiderService.LoadConversationAsync");
+                    return;
+                }
+
+                var conversationJson = await File.ReadAllTextAsync(conversationPath);
+                var conversationData = JsonSerializer.Deserialize<ConversationData>(conversationJson);
+
+                if (conversationData?.Messages != null)
+                {
+                    lock (_chatHistoryLock)
+                    {
+                        _chatHistory.Clear();
+                        _chatHistory.AddRange(conversationData.Messages);
+                    }
+                    
+                    await _errorHandler.LogInfoAsync($"Conversation loaded with {conversationData.Messages.Count} messages", "AiderService.LoadConversationAsync");
+                }
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.LoadConversationAsync");
+                throw new AiderSessionException("Failed to load conversation", ex);
+            }
+        }
+
+        public async Task ArchiveConversationAsync(string archiveName = null)
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(AiderService));
+
+            try
+            {
+                // Save current conversation first
+                await SaveConversationAsync();
+
+                // Create archive
+                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+                var archiveFileName = string.IsNullOrWhiteSpace(archiveName) 
+                    ? $"conversation_archive_{timestamp}.json"
+                    : $"{archiveName}_{timestamp}.json";
+
+                var conversationPath = GetConversationFilePath();
+                var archivePath = Path.Combine(GetConversationDirectory(), "archives", archiveFileName);
+                
+                // Ensure archive directory exists
+                Directory.CreateDirectory(Path.GetDirectoryName(archivePath));
+                
+                // Copy current conversation to archive
+                if (File.Exists(conversationPath))
+                {
+                    File.Copy(conversationPath, archivePath, true);
+                }
+
+                // Clear current conversation
+                await ClearChatHistoryAsync();
+                
+                await _errorHandler.LogInfoAsync($"Conversation archived to {archivePath}", "AiderService.ArchiveConversationAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.ArchiveConversationAsync");
+                throw new AiderSessionException("Failed to archive conversation", ex);
+            }
+        }
+
+        private async Task ConnectAsync()
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await _connectionSemaphore.WaitAsync();
+            
+            try
+            {
+                if (IsConnected)
+                {
+                    await _errorHandler.LogInfoAsync("Connection already established, skipping connect", "AiderService.ConnectAsync");
+                    return;
+                }
+
+                lock (_connectionStateLock)
+                {
+                    _lastConnectionAttempt = DateTime.UtcNow;
+                }
+
+                await _errorHandler.LogInfoAsync($"Connecting to Aider backend at {_aiderEndpoint} (attempt {_consecutiveFailures + 1}/{_maxConsecutiveFailures})", "AiderService.ConnectAsync");
+
+                // Dispose existing connection
+                if (_webSocket != null)
+                {
+                    await _errorHandler.LogInfoAsync($"Disposing existing WebSocket connection (State: {_webSocket.State})", "AiderService.ConnectAsync");
+                    _webSocket.Dispose();
+                }
+                
+                // Create new WebSocket connection
+                _webSocket = new ClientWebSocket();
+                
+                // Set connection options
+                _webSocket.Options.KeepAliveInterval = _heartbeatInterval;
+                _webSocket.Options.SetRequestHeader("User-Agent", "AiderVSExtension/1.0");
+                
+                await _errorHandler.LogInfoAsync($"WebSocket configured - KeepAlive: {_heartbeatInterval.TotalSeconds}s, Timeout: {_connectionTimeout.TotalSeconds}s", "AiderService.ConnectAsync");
+                
+                try
+                {
+                    // Connect with timeout
+                    using (var cts = new CancellationTokenSource(_connectionTimeout))
+                    {
+                        await _webSocket.ConnectAsync(new Uri(_aiderEndpoint), cts.Token);
+                    }
+
+                    _isConnected = true;
+                    
+                    // Reset consecutive failures on successful connection
+                    lock (_connectionStateLock)
+                    {
+                        _consecutiveFailures = 0;
+                    }
+                    
+                    await _errorHandler.LogInfoAsync($"WebSocket connection established (State: {_webSocket.State})", "AiderService.ConnectAsync");
+                    
+                    // Start background tasks
+                    await _errorHandler.LogInfoAsync("Starting background tasks for connection", "AiderService.ConnectAsync");
+                    _ = Task.Run(() => ReceiveMessagesAsync(_cancellationTokenSource?.Token ?? CancellationToken.None));
+                    _heartbeatTask = Task.Run(() => SendHeartbeatAsync(_cancellationTokenSource?.Token ?? CancellationToken.None));
+                    _realTimeUpdatesTask = Task.Run(() => ProcessRealTimeUpdatesAsync(_cancellationTokenSource?.Token ?? CancellationToken.None));
+                    
+                    // Notify connection status change
+                    ConnectionStatusChanged?.Invoke(this, new ConnectionStatusChangedEventArgs { IsConnected = true });
+                    
+                    stopwatch.Stop();
+                    await LogPerformanceMetrics("ConnectAsync", stopwatch, true, $"Connected to {_aiderEndpoint}");
+                    await LogServiceStatistics("Connection Established");
+                }
+                catch (Exception ex)
+                {
+                    // Increment consecutive failures
+                    lock (_connectionStateLock)
+                    {
+                        _consecutiveFailures++;
+                    }
+                    
+                    _isConnected = false;
+                    ConnectionStatusChanged?.Invoke(this, new ConnectionStatusChangedEventArgs
+                    {
+                        IsConnected = false,
+                        ErrorMessage = ex.Message
+                    });
+                    
+                    stopwatch.Stop();
+                    await LogPerformanceMetrics("ConnectAsync", stopwatch, false, $"Failed after {_consecutiveFailures} attempts: {ex.Message}");
+                    await _errorHandler.HandleExceptionAsync(ex, "AiderService.ConnectAsync");
+                    
+                    // Check if we've exceeded max consecutive failures
+                    if (_consecutiveFailures >= _maxConsecutiveFailures)
+                    {
+                        await _errorHandler.LogErrorAsync($"Maximum consecutive failures reached ({_maxConsecutiveFailures}). Service may be unavailable.", "AiderService.ConnectAsync");
+                        throw new AiderConnectionException($"Failed to connect after {_maxConsecutiveFailures} consecutive attempts. Service may be unavailable.", ex);
+                    }
+                    
+                    throw new AiderConnectionException("Failed to connect to Aider backend", ex);
+                }
+            }
+            finally
+            {
+                _connectionSemaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to reconnect with exponential backoff
+        /// </summary>
+        private async Task ReconnectWithBackoffAsync()
+        {
+            var backoffDelay = _reconnectDelay;
+            var maxBackoffDelay = TimeSpan.FromMinutes(5); // Maximum 5 minute delay
+            
+            for (int attempt = 1; attempt <= _maxConsecutiveFailures; attempt++)
+            {
+                try
+                {
+                    await _errorHandler.LogInfoAsync($"Reconnection attempt {attempt}/{_maxConsecutiveFailures} with {backoffDelay.TotalSeconds}s delay", "AiderService.ReconnectWithBackoffAsync");
+                    
+                    await Task.Delay(backoffDelay);
+                    await ConnectAsync();
+                    
+                    // If we get here, connection was successful
+                    await _errorHandler.LogInfoAsync("Reconnection successful", "AiderService.ReconnectWithBackoffAsync");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    await _errorHandler.LogWarningAsync($"Reconnection attempt {attempt} failed: {ex.Message}", "AiderService.ReconnectWithBackoffAsync");
+                    
+                    // Calculate next backoff delay (exponential with jitter)
+                    var nextDelay = TimeSpan.FromMilliseconds(backoffDelay.TotalMilliseconds * 2);
+                    var jitter = TimeSpan.FromMilliseconds(new Random().Next(0, (int)(nextDelay.TotalMilliseconds * 0.1)));
+                    backoffDelay = nextDelay.Add(jitter);
+                    
+                    // Cap the maximum delay
+                    if (backoffDelay > maxBackoffDelay)
+                        backoffDelay = maxBackoffDelay;
+                }
+            }
+            
+            await _errorHandler.LogErrorAsync($"Failed to reconnect after {_maxConsecutiveFailures} attempts", "AiderService.ReconnectWithBackoffAsync");
+        }
+
+        /// <summary>
+        /// Sends periodic heartbeat messages to maintain connection
+        /// </summary>
+        private async Task SendHeartbeatAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    await Task.Delay(_heartbeatInterval, cancellationToken);
+                    
+                    if (IsConnected)
+                    {
+                        try
+                        {
+                            var heartbeatMessage = new ChatMessage
+                            {
+                                Content = "heartbeat",
+                                Type = MessageType.System,
+                                Timestamp = DateTime.UtcNow
+                            };
+                            
+                            var messageJson = JsonSerializer.Serialize(heartbeatMessage);
+                            var messageBytes = Encoding.UTF8.GetBytes(messageJson);
+                            
+                            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)))
+                            using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token))
+                            {
+                                await _webSocket.SendAsync(
+                                    new ArraySegment<byte>(messageBytes),
+                                    WebSocketMessageType.Text,
+                                    true,
+                                    combinedCts.Token);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            await _errorHandler.LogWarningAsync($"Heartbeat failed: {ex.Message}", "AiderService.SendHeartbeatAsync");
+                            _isConnected = false;
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when cancellation is requested
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.SendHeartbeatAsync");
+            }
+        }
+
+        /// <summary>
+        /// Processes real-time updates and events
+        /// </summary>
+        private async Task ProcessRealTimeUpdatesAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    if (IsConnected)
+                    {
+                        // Send session status update
+                        SessionEvent?.Invoke(this, new SessionEventArgs 
+                        { 
+                            EventType = "status_update",
+                            Data = new { 
+                                connected = true, 
+                                messageCount = _chatHistory.Count,
+                                lastActivity = DateTime.UtcNow
+                            }
+                        });
+                    }
+                    
+                    await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when cancellation is requested
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.ProcessRealTimeUpdatesAsync");
+            }
+        }
+
+        private async Task ReceiveMessagesAsync(CancellationToken cancellationToken)
+        {
+            var buffer = new byte[4096];
+            var messageBuffer = new List<byte>();
+
+            try
+            {
+                while (!cancellationToken.IsCancellationRequested && IsConnected)
+                {
+                    var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
+                    
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await _errorHandler.LogWarningAsync("WebSocket connection closed by server", "AiderService.ReceiveMessagesAsync");
+                        break;
+                    }
+
+                    messageBuffer.AddRange(buffer.Take(result.Count));
+
+                    if (result.EndOfMessage)
+                    {
+                        var messageJson = Encoding.UTF8.GetString(messageBuffer.ToArray());
+                        messageBuffer.Clear();
+
+                        await ProcessReceivedMessage(messageJson);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when cancellation is requested
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.ReceiveMessagesAsync");
+                _isConnected = false;
+                ConnectionStatusChanged?.Invoke(this, new ConnectionStatusChangedEventArgs 
+                { 
+                    IsConnected = false, 
+                    ErrorMessage = ex.Message 
+                });
+                
+                // Attempt reconnection with backoff
+                _ = Task.Run(() => ReconnectWithBackoffAsync());
+            }
+        }
+
+        private async Task ProcessReceivedMessage(string messageJson)
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            try
+            {
+                var messageSizeKB = Encoding.UTF8.GetByteCount(messageJson) / 1024.0;
+                await _errorHandler.LogInfoAsync($"Processing received message - Size: {messageSizeKB:F2}KB", "AiderService.ProcessReceivedMessage");
+                
+                var chatMessage = JsonSerializer.Deserialize<ChatMessage>(messageJson);
+                
+                if (chatMessage != null && chatMessage.IsValid())
+                {
+                    var messagePreview = chatMessage.Content?.Length > 50
+                        ? chatMessage.Content.Substring(0, 50) + "..."
+                        : chatMessage.Content ?? "Empty";
+                    
+                    await _errorHandler.LogInfoAsync($"Received valid message - Type: {chatMessage.Type}, Preview: {messagePreview}", "AiderService.ProcessReceivedMessage");
+                    
+                    // Add to session manager's current conversation (skip heartbeat messages)
+                    if (chatMessage.Type != MessageType.System || chatMessage.Content != "heartbeat")
+                    {
+                        await _sessionManager.AddMessageToCurrentConversationAsync(chatMessage);
+                        await _errorHandler.LogInfoAsync($"Message added to session conversation: {chatMessage.Id}", "AiderService.ProcessReceivedMessage");
+                    }
+                    else
+                    {
+                        await _errorHandler.LogInfoAsync("Heartbeat message received, skipping session storage", "AiderService.ProcessReceivedMessage");
+                    }
+
+                    // Add to local chat history
+                    lock (_chatHistoryLock)
+                    {
+                        _chatHistory.Add(chatMessage);
+                    }
+
+                    // Notify listeners
+                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs { Message = chatMessage });
+                    
+                    stopwatch.Stop();
+                    await LogPerformanceMetrics("ProcessReceivedMessage", stopwatch, true, $"Type: {chatMessage.Type}, Size: {messageSizeKB:F2}KB");
+                }
+                else
+                {
+                    stopwatch.Stop();
+                    await LogPerformanceMetrics("ProcessReceivedMessage", stopwatch, false, "Invalid message format");
+                    await _errorHandler.LogWarningAsync($"Received invalid message - Size: {messageSizeKB:F2}KB, Content: {messageJson.Substring(0, Math.Min(200, messageJson.Length))}...", "AiderService.ProcessReceivedMessage");
+                }
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                await LogPerformanceMetrics("ProcessReceivedMessage", stopwatch, false, $"Exception: {ex.Message}");
+                await _errorHandler.LogErrorAsync($"Failed to process received message: {ex.Message}", "AiderService.ProcessReceivedMessage");
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.ProcessReceivedMessage");
+            }
+        }
+
+        private async Task ProcessMessageQueueAsync(CancellationToken cancellationToken)
+        {
+            var lastStatsLog = DateTime.UtcNow;
+            var statsLogInterval = TimeSpan.FromMinutes(2); // Log queue stats every 2 minutes
+            var processedCount = 0;
+            var emptyQueueCount = 0;
+            
+            try
+            {
+                await _errorHandler.LogInfoAsync("Message queue processing started", "AiderService.ProcessMessageQueueAsync");
+                
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    var currentTime = DateTime.UtcNow;
+                    var queuedMessage = await _messageQueue.DequeueAsync(cancellationToken);
+                    
+                    if (queuedMessage != null)
+                    {
+                        processedCount++;
+                        emptyQueueCount = 0; // Reset empty queue counter
+                        
+                        await SendMessageToBackend(queuedMessage, cancellationToken);
+                        
+                        // Log queue processing stats periodically
+                        if (currentTime - lastStatsLog >= statsLogInterval)
+                        {
+                            var queueStats = _messageQueue.GetStatistics();
+                            await _errorHandler.LogInfoAsync($"Queue processing stats - Processed: {processedCount}, Pending: {queueStats.PendingCount}, Failed: {queueStats.FailedCount}", "AiderService.ProcessMessageQueueAsync");
+                            lastStatsLog = currentTime;
+                        }
+                    }
+                    else
+                    {
+                        emptyQueueCount++;
+                        
+                        // Log when queue has been empty for a while (every 100 empty checks = ~10 seconds)
+                        if (emptyQueueCount % 100 == 0)
+                        {
+                            await _errorHandler.LogInfoAsync($"Message queue empty for {emptyQueueCount * 100}ms, processed {processedCount} messages total", "AiderService.ProcessMessageQueueAsync");
+                        }
+                        
+                        await Task.Delay(100, cancellationToken); // Wait before checking queue again
+                    }
+                }
+                
+                await _errorHandler.LogInfoAsync($"Message queue processing stopped - Total processed: {processedCount}", "AiderService.ProcessMessageQueueAsync");
+            }
+            catch (OperationCanceledException)
+            {
+                await _errorHandler.LogInfoAsync($"Message queue processing cancelled - Total processed: {processedCount}", "AiderService.ProcessMessageQueueAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.LogErrorAsync($"Message queue processing failed after processing {processedCount} messages: {ex.Message}", "AiderService.ProcessMessageQueueAsync");
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.ProcessMessageQueueAsync");
+            }
+        }
+
+        private async Task SendMessageToBackend(QueuedMessage queuedMessage, CancellationToken cancellationToken)
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var messagePreview = queuedMessage.Message.Content?.Length > 50
+                ? queuedMessage.Message.Content.Substring(0, 50) + "..."
+                : queuedMessage.Message.Content ?? "Empty";
+                
+            try
+            {
+                await _errorHandler.LogInfoAsync($"Sending message to backend - ID: {queuedMessage.Id}, Priority: {queuedMessage.Priority}, Attempt: {queuedMessage.RetryCount + 1}, Preview: {messagePreview}", "AiderService.SendMessageToBackend");
+                
+                if (!IsConnected)
+                {
+                    await _errorHandler.LogWarningAsync($"Connection lost, attempting to reconnect before sending message {queuedMessage.Id}", "AiderService.SendMessageToBackend");
+                    await ConnectAsync();
+                }
+
+                var messageJson = JsonSerializer.Serialize(queuedMessage.Message);
+                var messageBytes = Encoding.UTF8.GetBytes(messageJson);
+                var messageSizeKB = messageBytes.Length / 1024.0;
+
+                await _errorHandler.LogInfoAsync($"Message serialized - Size: {messageSizeKB:F2}KB, WebSocket State: {_webSocket?.State}", "AiderService.SendMessageToBackend");
+
+                using (var cts = new CancellationTokenSource(_messageTimeout))
+                using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token))
+                {
+                    await _webSocket.SendAsync(
+                        new ArraySegment<byte>(messageBytes),
+                        WebSocketMessageType.Text,
+                        true,
+                        combinedCts.Token);
+                }
+
+                // Mark message as completed in queue
+                await _messageQueue.MarkAsCompletedAsync(queuedMessage.Id);
+
+                // Notify message sent
+                MessageSent?.Invoke(this, new MessageSentEventArgs { Message = queuedMessage.Message });
+
+                stopwatch.Stop();
+                await LogPerformanceMetrics("SendMessageToBackend", stopwatch, true, $"ID: {queuedMessage.Id}, Size: {messageSizeKB:F2}KB");
+                await _errorHandler.LogInfoAsync($"Message successfully sent to Aider backend: {queuedMessage.Id}", "AiderService.SendMessageToBackend");
+                
+                // Log queue statistics after successful send
+                if (stopwatch.ElapsedMilliseconds % 10 == 0) // Log every 10th message to avoid spam
+                {
+                    await LogServiceStatistics("Message Sent");
+                }
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                await LogPerformanceMetrics("SendMessageToBackend", stopwatch, false, $"ID: {queuedMessage.Id}, Error: {ex.Message}");
+                
+                // Mark message as failed in queue (will handle retry logic automatically)
+                var success = await _messageQueue.MarkAsFailedAsync(queuedMessage.Id, ex.Message);
+                
+                if (!success)
+                {
+                    // Message exceeded retry limit
+                    await _errorHandler.LogErrorAsync($"Message {queuedMessage.Id} exceeded maximum retry attempts ({queuedMessage.RetryCount})", "AiderService.SendMessageToBackend");
+                    await _errorHandler.HandleExceptionAsync(new AiderCommunicationException($"Failed to send message after maximum retry attempts: {queuedMessage.Id}", ex), "AiderService.SendMessageToBackend");
+                }
+                else
+                {
+                    await _errorHandler.LogWarningAsync($"Message send failed, will retry: {queuedMessage.Id} (Attempt {queuedMessage.RetryCount + 1}) - {ex.Message}", "AiderService.SendMessageToBackend");
+                }
+            }
+        }
+
+        private async Task MonitorConnectionAsync(CancellationToken cancellationToken)
+        {
+            var lastStatsLog = DateTime.UtcNow;
+            var statsLogInterval = TimeSpan.FromMinutes(5); // Log stats every 5 minutes
+            var monitoringInterval = TimeSpan.FromSeconds(10);
+            
+            try
+            {
+                await _errorHandler.LogInfoAsync("Connection monitoring started", "AiderService.MonitorConnectionAsync");
+                
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    var currentTime = DateTime.UtcNow;
+                    
+                    // Check connection status
+                    if (!IsConnected)
+                    {
+                        await _errorHandler.LogWarningAsync($"Connection lost detected during monitoring (Consecutive failures: {_consecutiveFailures})", "AiderService.MonitorConnectionAsync");
+                        
+                        try
+                        {
+                            await ReconnectWithBackoffAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            await _errorHandler.LogWarningAsync($"Connection monitoring: Failed to reconnect: {ex.Message}", "AiderService.MonitorConnectionAsync");
+                        }
+                    }
+                    else
+                    {
+                        // Connection is healthy, log periodic status
+                        if (currentTime - lastStatsLog >= statsLogInterval)
+                        {
+                            await LogServiceStatistics("Periodic Monitoring");
+                            lastStatsLog = currentTime;
+                        }
+                    }
+
+                    await Task.Delay(monitoringInterval, cancellationToken);
+                }
+                
+                await _errorHandler.LogInfoAsync("Connection monitoring stopped", "AiderService.MonitorConnectionAsync");
+            }
+            catch (OperationCanceledException)
+            {
+                await _errorHandler.LogInfoAsync("Connection monitoring cancelled", "AiderService.MonitorConnectionAsync");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.LogErrorAsync($"Connection monitoring failed: {ex.Message}", "AiderService.MonitorConnectionAsync");
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.MonitorConnectionAsync");
+            }
+        }
+
+        private void LoadConfiguration()
+        {
+            try
+            {
+                // Load configuration from configuration service
+                _aiderEndpoint = _configurationService.GetSetting(Constants.ConfigurationKeys.AiderEndpoint, _aiderEndpoint);
+                _httpEndpoint = _configurationService.GetSetting(Constants.ConfigurationKeys.AiderHttpEndpoint, _httpEndpoint);
+                _maxRetryAttempts = _configurationService.GetSetting(Constants.ConfigurationKeys.MaxRetries, _maxRetryAttempts);
+                
+                var connectionTimeoutMs = _configurationService.GetSetting(Constants.ConfigurationKeys.ConnectionTimeout, 30000);
+                _connectionTimeout = TimeSpan.FromMilliseconds(connectionTimeoutMs);
+                
+                var messageTimeoutMs = _configurationService.GetSetting(Constants.ConfigurationKeys.MessageTimeout, 60000);
+                _messageTimeout = TimeSpan.FromMilliseconds(messageTimeoutMs);
+                
+                var retryDelayMs = _configurationService.GetSetting(Constants.ConfigurationKeys.RetryDelay, 1000);
+                _retryDelay = TimeSpan.FromMilliseconds(retryDelayMs);
+                
+                var heartbeatIntervalMs = _configurationService.GetSetting(Constants.ConfigurationKeys.HeartbeatInterval, 30000);
+                _heartbeatInterval = TimeSpan.FromMilliseconds(heartbeatIntervalMs);
+                
+                var reconnectDelayMs = _configurationService.GetSetting(Constants.ConfigurationKeys.ReconnectDelay, 5000);
+                _reconnectDelay = TimeSpan.FromMilliseconds(reconnectDelayMs);
+                
+                _maxConsecutiveFailures = _configurationService.GetSetting(Constants.ConfigurationKeys.MaxConsecutiveFailures, _maxConsecutiveFailures);
+                
+                _errorHandler.LogInfoAsync("Configuration loaded successfully", "AiderService.LoadConfiguration");
+            }
+            catch (Exception ex)
+            {
+                _errorHandler.HandleExceptionAsync(ex, "AiderService.LoadConfiguration");
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            _isDisposed = true;
+
+            try
+            {
+                _errorHandler?.LogInfoAsync("Starting Aider service disposal", "AiderService.Dispose");
+                
+                // Log final service statistics
+                try
+                {
+                    LogServiceStatistics("Service Disposal").Wait(TimeSpan.FromSeconds(2));
+                }
+                catch (Exception ex)
+                {
+                    _errorHandler?.LogWarningAsync($"Failed to log final statistics during disposal: {ex.Message}", "AiderService.Dispose");
+                }
+
+                // Unsubscribe from session manager events
+                if (_sessionManager != null)
+                {
+                    _errorHandler?.LogInfoAsync("Unsubscribing from session manager events", "AiderService.Dispose");
+                    _sessionManager.SessionStarted -= OnSessionStarted;
+                    _sessionManager.SessionEnded -= OnSessionEnded;
+                    _sessionManager.ConversationChanged -= OnConversationChanged;
+                    _sessionManager.SessionError -= OnSessionError;
+                }
+
+                // Cancel all operations
+                _errorHandler?.LogInfoAsync("Cancelling background operations", "AiderService.Dispose");
+                _cancellationTokenSource?.Cancel();
+
+                // Wait for background tasks to complete
+                var backgroundTasks = new[] { _messageProcessingTask, _connectionMonitorTask, _heartbeatTask, _realTimeUpdatesTask }.Where(t => t != null).ToArray();
+                if (backgroundTasks.Length > 0)
+                {
+                    _errorHandler?.LogInfoAsync($"Waiting for {backgroundTasks.Length} background tasks to complete", "AiderService.Dispose");
+                    
+                    try
+                    {
+                        Task.WaitAll(backgroundTasks, TimeSpan.FromSeconds(5));
+                        _errorHandler?.LogInfoAsync("All background tasks completed successfully", "AiderService.Dispose");
+                    }
+                    catch (AggregateException ex)
+                    {
+                        _errorHandler?.LogWarningAsync($"Some background tasks did not complete within timeout: {ex.InnerExceptions.Count} exceptions", "AiderService.Dispose");
+                    }
+                }
+
+                // Close WebSocket connection
+                if (_webSocket?.State == WebSocketState.Open)
+                {
+                    _errorHandler?.LogInfoAsync($"Closing WebSocket connection (State: {_webSocket.State})", "AiderService.Dispose");
+                    try
+                    {
+                        _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Service disposing", CancellationToken.None).Wait(TimeSpan.FromSeconds(5));
+                        _errorHandler?.LogInfoAsync("WebSocket connection closed successfully", "AiderService.Dispose");
+                    }
+                    catch (Exception ex)
+                    {
+                        _errorHandler?.LogWarningAsync($"Failed to close WebSocket gracefully: {ex.Message}", "AiderService.Dispose");
+                    }
+                }
+
+                // Dispose resources
+                _errorHandler?.LogInfoAsync("Disposing resources", "AiderService.Dispose");
+                _webSocket?.Dispose();
+                _httpClient?.Dispose();
+                _cancellationTokenSource?.Dispose();
+                _connectionSemaphore?.Dispose();
+
+                stopwatch.Stop();
+                _errorHandler?.LogInfoAsync($"Aider service disposed successfully in {stopwatch.ElapsedMilliseconds}ms", "AiderService.Dispose");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _errorHandler?.LogErrorAsync($"Error during service disposal after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}", "AiderService.Dispose");
+                _errorHandler?.HandleExceptionAsync(ex, "AiderService.Dispose");
+            }
+        }
+
+        private string GetConversationDirectory()
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var extensionDataPath = Path.Combine(appDataPath, "AiderVSExtension", "Conversations");
+            Directory.CreateDirectory(extensionDataPath);
+            return extensionDataPath;
+        }
+
+        private string GetConversationFilePath()
+        {
+            return Path.Combine(GetConversationDirectory(), "current_conversation.json");
+        }
+
+        /// <summary>
+        /// Gets message queue statistics
+        /// </summary>
+        public QueueStatistics GetQueueStatistics()
+        {
+            return _messageQueue.GetStatistics();
+        }
+
+        /// <summary>
+        /// Gets all messages currently in the queue
+        /// </summary>
+        public IEnumerable<QueuedMessage> GetQueuedMessages()
+        {
+            return _messageQueue.GetAllMessages();
+        }
+
+        /// <summary>
+        /// Clears all messages from the queue
+        /// </summary>
+        public async Task ClearMessageQueueAsync()
+        {
+            await _messageQueue.ClearAsync();
+        }
+
+        /// <summary>
+        /// Logs comprehensive service statistics for monitoring
+        /// </summary>
+        private async Task LogServiceStatistics(string context)
+        {
+            try
+            {
+                var queueStats = _messageQueue.GetStatistics();
+                var connectionInfo = new
+                {
+                    IsConnected = IsConnected,
+                    ConsecutiveFailures = _consecutiveFailures,
+                    LastConnectionAttempt = _lastConnectionAttempt,
+                    WebSocketState = _webSocket?.State.ToString() ?? "None"
+                };
+                
+                var sessionInfo = new
+                {
+                    IsSessionActive = _sessionManager.IsSessionActive,
+                    SessionDuration = _sessionManager.SessionDuration,
+                    CurrentConversationId = _sessionManager.ActiveConversationId,
+                    MessageCount = _chatHistory.Count
+                };
+                
+                await _errorHandler.LogInfoAsync($"[{context}] Service Statistics - " +
+                    $"Connection: {connectionInfo.IsConnected} (Failures: {connectionInfo.ConsecutiveFailures}), " +
+                    $"Queue: {queueStats.PendingCount} pending/{queueStats.ProcessedCount} processed/{queueStats.FailedCount} failed, " +
+                    $"Session: {sessionInfo.IsSessionActive} (Duration: {sessionInfo.SessionDuration}), " +
+                    $"Messages: {sessionInfo.MessageCount}", "AiderService.LogServiceStatistics");
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.LogWarningAsync($"Failed to log service statistics: {ex.Message}", "AiderService.LogServiceStatistics");
+            }
+        }
+
+        /// <summary>
+        /// Logs performance metrics for method execution
+        /// </summary>
+        private async Task LogPerformanceMetrics(string methodName, System.Diagnostics.Stopwatch stopwatch, bool success, string additionalInfo = null)
+        {
+            try
+            {
+                var logLevel = success ? "Info" : "Warning";
+                var statusText = success ? "completed" : "failed";
+                var info = !string.IsNullOrEmpty(additionalInfo) ? $" - {additionalInfo}" : "";
+                
+                await _errorHandler.LogInfoAsync($"[PERF] {methodName} {statusText} in {stopwatch.ElapsedMilliseconds}ms{info}", $"AiderService.{methodName}");
+                
+                // Log warning for slow operations (>5 seconds)
+                if (stopwatch.ElapsedMilliseconds > 5000)
+                {
+                    await _errorHandler.LogWarningAsync($"Slow operation detected: {methodName} took {stopwatch.ElapsedMilliseconds}ms", $"AiderService.{methodName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Don't let logging failures affect the main operation
+                await _errorHandler.LogWarningAsync($"Failed to log performance metrics: {ex.Message}", "AiderService.LogPerformanceMetrics");
+            }
+        }
+
+        #region Session Manager Event Handlers
+
+        /// <summary>
+        /// Handles session started events from the session manager
+        /// </summary>
+        private async void OnSessionStarted(object sender, SessionStartedEventArgs e)
+        {
+            try
+            {
+                await _errorHandler.LogInfoAsync($"Session started at {e.StartTime}. Restored conversation: {e.RestoredConversationId ?? "None"}", "AiderService.OnSessionStarted");
+                
+                // Ensure connection is established when session starts
+                if (!IsConnected)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await ConnectAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            await _errorHandler.LogWarningAsync($"Failed to connect during session start: {ex.Message}", "AiderService.OnSessionStarted");
+                        }
+                    });
+                }
+                
+                // Notify session event
+                SessionEvent?.Invoke(this, new SessionEventArgs
+                {
+                    EventType = "session_started",
+                    Data = new {
+                        startTime = e.StartTime,
+                        restoredConversationId = e.RestoredConversationId
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.OnSessionStarted");
+            }
+        }
+
+        /// <summary>
+        /// Handles session ended events from the session manager
+        /// </summary>
+        private async void OnSessionEnded(object sender, SessionEndedEventArgs e)
+        {
+            try
+            {
+                await _errorHandler.LogInfoAsync($"Session ended at {e.EndTime}. Duration: {e.Duration}. Messages: {e.MessageCount}", "AiderService.OnSessionEnded");
+                
+                // Notify session event
+                SessionEvent?.Invoke(this, new SessionEventArgs
+                {
+                    EventType = "session_ended",
+                    Data = new {
+                        endTime = e.EndTime,
+                        duration = e.Duration,
+                        conversationId = e.ConversationId,
+                        messageCount = e.MessageCount
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.OnSessionEnded");
+            }
+        }
+
+        /// <summary>
+        /// Handles conversation changed events from the session manager
+        /// </summary>
+        private async void OnConversationChanged(object sender, ConversationChangedEventArgs e)
+        {
+            try
+            {
+                await _errorHandler.LogInfoAsync($"Conversation changed from {e.OldConversationId ?? "None"} to {e.NewConversationId}", "AiderService.OnConversationChanged");
+                
+                // Clear local chat history when conversation changes
+                lock (_chatHistoryLock)
+                {
+                    _chatHistory.Clear();
+                }
+                
+                // Load messages from the new conversation into local history
+                var currentConversation = _sessionManager.CurrentConversation;
+                if (currentConversation?.Messages != null)
+                {
+                    lock (_chatHistoryLock)
+                    {
+                        _chatHistory.AddRange(currentConversation.Messages);
+                    }
+                }
+                
+                // Notify session event
+                SessionEvent?.Invoke(this, new SessionEventArgs
+                {
+                    EventType = "conversation_changed",
+                    Data = new {
+                        oldConversationId = e.OldConversationId,
+                        newConversationId = e.NewConversationId,
+                        changedAt = e.ChangedAt
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.OnConversationChanged");
+            }
+        }
+
+        /// <summary>
+        /// Handles session error events from the session manager
+        /// </summary>
+        private async void OnSessionError(object sender, SessionErrorEventArgs e)
+        {
+            try
+            {
+                await _errorHandler.LogErrorAsync($"Session error in {e.Context}: {e.ErrorMessage}", "AiderService.OnSessionError");
+                
+                // Attempt recovery if the session manager supports it
+                if (_sessionManager.IsSessionActive)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _sessionManager.RecoverFromErrorAsync(e.Context);
+                        }
+                        catch (Exception recoveryEx)
+                        {
+                            await _errorHandler.LogErrorAsync($"Session recovery failed: {recoveryEx.Message}", "AiderService.OnSessionError");
+                        }
+                    });
+                }
+                
+                // Notify session event
+                SessionEvent?.Invoke(this, new SessionEventArgs
+                {
+                    EventType = "session_error",
+                    Data = new {
+                        context = e.Context,
+                        errorMessage = e.ErrorMessage,
+                        exception = e.Exception?.GetType().Name
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                await _errorHandler.HandleExceptionAsync(ex, "AiderService.OnSessionError");
+            }
+        }
+
+        #endregion
+
+        private class ConversationData
+        {
+            public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+            public DateTime SavedAt { get; set; }
+            public string Version { get; set; } = "1.0";
+        }
+    }
+}

@@ -1,0 +1,128 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj": {}
+  },
+  "projects": {
+    "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj",
+        "projectName": "AiderVSExtension",
+        "projectPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj",
+        "packagesPath": "/Users/michaelleib/.nuget/packages/",
+        "outputPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/michaelleib/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net472",
+          "dependencies": {
+            "LibGit2Sharp": {
+              "target": "Package",
+              "version": "[0.27.2, )"
+            },
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.3, )",
+              "autoReferenced": true
+            },
+            "Microsoft.VSSDK.BuildTools": {
+              "target": "Package",
+              "version": "[17.0.5232, )"
+            },
+            "Microsoft.VisualStudio.ComponentModelHost": {
+              "target": "Package",
+              "version": "[17.0.67, )"
+            },
+            "Microsoft.VisualStudio.Editor": {
+              "target": "Package",
+              "version": "[17.0.67, )"
+            },
+            "Microsoft.VisualStudio.Language.Intellisense": {
+              "target": "Package",
+              "version": "[17.0.67, )"
+            },
+            "Microsoft.VisualStudio.SDK": {
+              "target": "Package",
+              "version": "[17.0.31903.59, )"
+            },
+            "Microsoft.VisualStudio.Shell.Framework": {
+              "target": "Package",
+              "version": "[17.0.31903.59, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop": {
+              "target": "Package",
+              "version": "[17.0.31903.59, )"
+            },
+            "Microsoft.VisualStudio.Text.Logic": {
+              "target": "Package",
+              "version": "[17.0.67, )"
+            },
+            "Microsoft.VisualStudio.Text.UI.Wpf": {
+              "target": "Package",
+              "version": "[17.0.67, )"
+            },
+            "Microsoft.VisualStudio.Threading": {
+              "target": "Package",
+              "version": "[17.0.64, )"
+            },
+            "Microsoft.VisualStudio.Utilities": {
+              "target": "Package",
+              "version": "[17.0.31903.59, )"
+            },
+            "Microsoft.VisualStudio.Validation": {
+              "target": "Package",
+              "version": "[17.0.58, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "OpenAI": {
+              "target": "Package",
+              "version": "[1.11.0, )"
+            },
+            "System.ComponentModel.Composition": {
+              "target": "Package",
+              "version": "[4.7.0, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[6.0.9, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

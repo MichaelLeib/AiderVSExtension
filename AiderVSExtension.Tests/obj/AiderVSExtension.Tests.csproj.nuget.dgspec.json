@@ -1,0 +1,314 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/michaelleib/Development/Aider-VS/AiderVSExtension.Tests/AiderVSExtension.Tests.csproj": {}
+  },
+  "projects": {
+    "/Users/michaelleib/Development/Aider-VS/AiderVSExtension.Tests/AiderVSExtension.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension.Tests/AiderVSExtension.Tests.csproj",
+        "projectName": "AiderVSExtension.Tests",
+        "projectPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension.Tests/AiderVSExtension.Tests.csproj",
+        "packagesPath": "/Users/michaelleib/.nuget/packages/",
+        "outputPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/michaelleib/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0-windows"
+        ],
+        "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0-windows7.0": {
+            "targetAlias": "net8.0-windows",
+            "projectReferences": {
+              "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj": {
+                "projectPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
+          "dependencies": {
+            "AutoFixture": {
+              "target": "Package",
+              "version": "[4.18.1, )"
+            },
+            "BenchmarkDotNet": {
+              "target": "Package",
+              "version": "[0.13.12, )"
+            },
+            "Bogus": {
+              "target": "Package",
+              "version": "[35.4.0, )"
+            },
+            "FakeItEasy": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "FluentAssertions": {
+              "target": "Package",
+              "version": "[6.12.0, )"
+            },
+            "LibGit2Sharp": {
+              "target": "Package",
+              "version": "[0.29.0, )"
+            },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.9.0, )"
+            },
+            "Microsoft.VisualStudio.Shell.Framework": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.TextManager.Interop": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.70, )"
+            },
+            "NBomber": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "System.ComponentModel.Annotations": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.6.6, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.5.7, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj",
+        "projectName": "AiderVSExtension",
+        "projectPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/AiderVSExtension.csproj",
+        "packagesPath": "/Users/michaelleib/.nuget/packages/",
+        "outputPath": "/Users/michaelleib/Development/Aider-VS/AiderVSExtension/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/michaelleib/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0-windows"
+        ],
+        "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0-windows7.0": {
+            "targetAlias": "net8.0-windows",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
+          "dependencies": {
+            "LibGit2Sharp": {
+              "target": "Package",
+              "version": "[0.29.0, )"
+            },
+            "Microsoft.VSSDK.BuildTools": {
+              "target": "Package",
+              "version": "[17.9.3168, )"
+            },
+            "Microsoft.VisualStudio.ComponentModelHost": {
+              "target": "Package",
+              "version": "[17.10.191, )"
+            },
+            "Microsoft.VisualStudio.Editor": {
+              "target": "Package",
+              "version": "[17.10.191, )"
+            },
+            "Microsoft.VisualStudio.Language.Intellisense": {
+              "target": "Package",
+              "version": "[17.10.191, )"
+            },
+            "Microsoft.VisualStudio.SDK": {
+              "target": "Package",
+              "version": "[17.10.40171, )"
+            },
+            "Microsoft.VisualStudio.Shell.Framework": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.10.0": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.11.0": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.12.0": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime": {
+              "target": "Package",
+              "version": "[14.3.26929, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.15.3.DesignTime": {
+              "target": "Package",
+              "version": "[15.0.26929, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.8.0": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Shell.Interop.9.0": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Text.Logic": {
+              "target": "Package",
+              "version": "[17.10.191, )"
+            },
+            "Microsoft.VisualStudio.Text.UI.Wpf": {
+              "target": "Package",
+              "version": "[17.10.191, )"
+            },
+            "Microsoft.VisualStudio.Threading": {
+              "target": "Package",
+              "version": "[17.10.48, )"
+            },
+            "Microsoft.VisualStudio.Utilities": {
+              "target": "Package",
+              "version": "[17.10.40170, )"
+            },
+            "Microsoft.VisualStudio.Validation": {
+              "target": "Package",
+              "version": "[17.8.8, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "OpenAI": {
+              "target": "Package",
+              "version": "[1.11.0, )"
+            },
+            "System.ComponentModel.Composition": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.18, 8.0.18]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,159 @@
+<UserControl x:Class="AiderVSExtension.UI.Chat.ContextMenuControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:AiderVSExtension.UI.Converters"
+             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="400"
+             MaxHeight="400"
+             MaxWidth="500">
+    
+    <UserControl.Resources>
+        <!-- Converters -->
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        
+        <Style x:Key="ContextMenuItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.CommandBarHoverBackgroundBeginKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.CommandBarTextHoverKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.CommandBarSelectedBackgroundBeginKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.CommandBarTextSelectedKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.ToolWindowTextKey}}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="10,8,10,4"/>
+            <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}"/>
+        </Style>
+        
+        <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+            <Setter Property="Margin" Value="10,8"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.SearchBoxBackgroundKey}}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.SearchBoxTextKey}}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsColors.SearchBoxBorderKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}"/>
+            <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Border Background="{DynamicResource {x:Static shell:VsColors.ContextMenuBackgroundKey}}"
+            BorderBrush="{DynamicResource {x:Static shell:VsColors.ContextMenuBorderKey}}"
+            BorderThickness="1"
+            CornerRadius="4">
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Search box for files -->
+            <TextBox Grid.Row="0"
+                     Name="SearchTextBox"
+                     Style="{StaticResource SearchBoxStyle}"
+                     TextChanged="SearchTextBox_TextChanged"
+                     Visibility="Collapsed">
+                <TextBox.Resources>
+                    <Style TargetType="TextBox" BasedOn="{StaticResource SearchBoxStyle}">
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <VisualBrush AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                            <VisualBrush.Visual>
+                                                <Label Content="Search files..." 
+                                                       Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}" 
+                                                       FontStyle="Italic"/>
+                                            </VisualBrush.Visual>
+                                        </VisualBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
+            
+            <!-- Context menu items -->
+            <ListBox Grid.Row="1"
+                     Name="ContextItemsList"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     SelectionMode="Single"
+                     ItemContainerStyle="{StaticResource ContextMenuItemStyle}"
+                     MouseDoubleClick="ContextItemsList_MouseDoubleClick"
+                     KeyDown="ContextItemsList_KeyDown"
+                     MaxHeight="350">
+                
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Icon -->
+                            <TextBlock Grid.Column="0"
+                                      Text="{Binding Icon}"
+                                      FontFamily="Segoe UI Symbol"
+                                      FontSize="16"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"/>
+                            
+                            <!-- Content -->
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding Title}"
+                                          FontWeight="Normal"
+                                          FontSize="13"/>
+                                <TextBlock Text="{Binding Subtitle}"
+                                          FontSize="11"
+                                          Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}"
+                                          Visibility="{Binding HasSubtitle, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </StackPanel>
+                            
+                            <!-- Keyboard shortcut -->
+                            <TextBlock Grid.Column="2"
+                                      Text="{Binding KeyboardShortcut}"
+                                      FontSize="11"
+                                      Foreground="{DynamicResource {x:Static shell:VsColors.GrayTextKey}}"
+                                      Margin="10,0,0,0"
+                                      VerticalAlignment="Center"
+                                      Visibility="{Binding HasKeyboardShortcut, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Border>
+</UserControl>

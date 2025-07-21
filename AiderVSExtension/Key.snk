@@ -1,0 +1,4 @@
+# This is a placeholder for the strong name key file
+# In a real Windows development environment, this would be generated using:
+# sn -k Key.snk
+# For now, this serves as a placeholder to complete the project structure

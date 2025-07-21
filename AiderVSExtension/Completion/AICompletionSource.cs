@@ -150,7 +150,7 @@ namespace AiderVSExtension.Completion
         {
             try
             {
-                return _configurationService?.GetSetting(Models.AiderVSExtension.Models.Constants.ConfigurationKeys.AICompletionEnabled, Models.Constants.DefaultValues.DefaultAICompletionEnabled) ?? false;
+                return _configurationService?.GetSetting(AiderVSExtension.Models.Constants.ConfigurationKeys.AICompletionEnabled, AiderVSExtension.Models.Constants.DefaultValues.DefaultAICompletionEnabled) ?? false;
             }
             catch (Exception ex)
             {

@@ -473,9 +473,9 @@ namespace AiderVSExtension.Models
 
             var items = collection.ToList();
             
-            if (maxItems.HasValue && items.Count > maxItems.Value)
+            if (maxItems != -1 && items.Count > maxItems)
             {
-                errors.Add($"{fieldName} cannot contain more than {maxItems.Value} items");
+                errors.Add($"{fieldName} cannot contain more than {maxItems} items");
             }
 
             for (int i = 0; i < items.Count; i++)

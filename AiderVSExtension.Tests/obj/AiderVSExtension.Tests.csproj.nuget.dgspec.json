@@ -20,6 +20,7 @@
           "net472"
         ],
         "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -42,7 +43,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net472": {
@@ -70,11 +71,11 @@
             },
             "LibGit2Sharp": {
               "target": "Package",
-              "version": "[0.29.0, )"
+              "version": "[0.27.2, )"
             },
             "Microsoft.Extensions.Logging.Abstractions": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[6.0.4, )"
             },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
@@ -88,15 +89,15 @@
             },
             "Microsoft.VisualStudio.Shell.Framework": {
               "target": "Package",
-              "version": "[17.10.40170, )"
+              "version": "[17.0.32112.339, )"
             },
             "Microsoft.VisualStudio.Shell.Interop": {
               "target": "Package",
-              "version": "[17.10.40170, )"
+              "version": "[17.0.32112.339, )"
             },
             "Microsoft.VisualStudio.TextManager.Interop": {
               "target": "Package",
-              "version": "[17.10.40170, )"
+              "version": "[17.0.32112.339, )"
             },
             "Moq": {
               "target": "Package",
@@ -112,7 +113,7 @@
             },
             "System.Text.Json": {
               "target": "Package",
-              "version": "[9.0.3, )"
+              "version": "[6.0.10, )"
             },
             "coverlet.collector": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -131,7 +132,7 @@
               "version": "[2.5.7, )"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -151,6 +152,7 @@
           "net472"
         ],
         "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -169,7 +171,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net472": {
@@ -237,10 +239,6 @@
               "target": "Package",
               "version": "[13.0.3, )"
             },
-            "OpenAI": {
-              "target": "Package",
-              "version": "[1.11.0, )"
-            },
             "System.ComponentModel.Composition": {
               "target": "Package",
               "version": "[4.7.0, )"
@@ -250,7 +248,7 @@
               "version": "[6.0.10, )"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
         }
       }
     }

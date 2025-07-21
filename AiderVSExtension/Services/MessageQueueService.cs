@@ -34,8 +34,8 @@ namespace AiderVSExtension.Services
 
         public MessageQueueService()
         {
-            _queue = new ConcurrentQueue<QueuedMessage>();
-            _messageIndex = new ConcurrentDictionary<string, QueuedMessage>();
+            _queue = new ConcurrentQueue<AiderVSExtension.Interfaces.QueuedMessage>();
+            _messageIndex = new ConcurrentDictionary<string, AiderVSExtension.Interfaces.QueuedMessage>();
             _statistics = new AiderVSExtension.Interfaces.QueueStatistics
             {
                 StartTime = DateTime.UtcNow
@@ -95,7 +95,7 @@ namespace AiderVSExtension.Services
                 }
             }
 
-            return await Task.FromResult<QueuedMessage>(null);
+            return await Task.FromResult<AiderVSExtension.Interfaces.QueuedMessage>(null);
         }
 
         /// <inheritdoc/>

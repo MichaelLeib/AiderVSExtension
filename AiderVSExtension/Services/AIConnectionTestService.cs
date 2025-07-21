@@ -134,7 +134,7 @@ namespace AiderVSExtension.Services
                 
                 var response = await client.PostAsync("v1/messages", content, cancellationToken);
                 
-                if (response.IsSuccessfulfulStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     return new ConnectionTestResult
                     {
@@ -199,7 +199,7 @@ namespace AiderVSExtension.Services
                 // Test with a simple model list request
                 var response = await client.GetAsync("api/tags", cancellationToken);
                 
-                if (response.IsSuccessfulfulStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     return new ConnectionTestResult

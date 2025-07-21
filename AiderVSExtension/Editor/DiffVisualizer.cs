@@ -115,8 +115,7 @@ namespace AiderVSExtension.Editor
 
                 // Fallback: create a new instance if MEF lookup fails
                 // This is not ideal but provides basic functionality
-                var errorHandler = serviceContainer?.GetService<IErrorHandler>();
-                return new DiffVisualizer(errorHandler);
+                return null;
             }
             catch (Exception ex)
             {

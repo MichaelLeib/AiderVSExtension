@@ -13,7 +13,7 @@ DEBUG;TRACE;DEBUG;NETFRAMEWORK;NET472;;NET30_OR_GREATER;NET35_OR_GREATER;NET40_O
 81641159328
 2338257848
 170-1300418971
-249-278236561
+2391808688591
 UI/Chat/ChatControl.xaml;UI/Chat/ContextMenuControl.xaml;UI/Chat/MessageRenderer.xaml;UI/Configuration/AdvancedConfigurationPage.xaml;ConfigurationPage.xaml;UI/AiderSetupDialog.xaml;UI/Configuration/ProfileEditorDialog.xaml;UI/Configuration/TemplateEditorDialog.xaml;
 
 True

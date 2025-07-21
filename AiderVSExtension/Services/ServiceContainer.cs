@@ -385,7 +385,7 @@ namespace AiderVSExtension.Services
             {
                 var errorHandler = GetService<IErrorHandler>();
                 var quickFixProvider = GetService<IQuickFixProvider>();
-                return new OutputWindowService(serviceProvider, errorHandler, quickFixProvider);
+                return new OutputWindowService(serviceProvider, quickFixProvider, errorHandler);
             });
         }
 

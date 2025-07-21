@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using AiderVSExtension.Services;

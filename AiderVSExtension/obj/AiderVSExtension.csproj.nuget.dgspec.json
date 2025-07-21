@@ -20,6 +20,7 @@
           "net472"
         ],
         "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,7 +39,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net472": {
@@ -106,10 +107,6 @@
               "target": "Package",
               "version": "[13.0.3, )"
             },
-            "OpenAI": {
-              "target": "Package",
-              "version": "[1.11.0, )"
-            },
             "System.ComponentModel.Composition": {
               "target": "Package",
               "version": "[4.7.0, )"
@@ -119,7 +116,7 @@
               "version": "[6.0.10, )"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
         }
       }
     }

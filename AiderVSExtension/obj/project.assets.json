@@ -7180,7 +7180,6 @@
         "net472"
       ],
       "sources": {
-        "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -7199,7 +7198,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.100"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net472": {
@@ -7280,7 +7279,7 @@
             "version": "[6.0.10, )"
           }
         },
-        "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.7/libexec/sdk/9.0.108/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -3,66 +3,65 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.Framework"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource {x:Static shell:VsColors.ToolWindowBackgroundKey}}"
-             Foreground="{DynamicResource {x:Static shell:VsColors.ToolWindowTextKey}}">
+             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+             Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
     
     <UserControl.Resources>
         <!-- VS-themed styles for controls -->
         <Style x:Key="VsLabelStyle" TargetType="Label">
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.ToolWindowTextKey}}" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}" />
         </Style>
         
         <Style x:Key="VsTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.ComboBoxBackgroundKey}}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsColors.ComboBoxBorderKey}}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}" />
             <Setter Property="Padding" Value="3" />
         </Style>
         
         <Style x:Key="VsPasswordBoxStyle" TargetType="PasswordBox">
-            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.ComboBoxBackgroundKey}}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsColors.ComboBoxBorderKey}}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}" />
             <Setter Property="Padding" Value="3" />
         </Style>
         
         <Style x:Key="VsComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.ComboBoxBackgroundKey}}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static shell:VsColors.ComboBoxBorderKey}}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}" />
         </Style>
         
         <Style x:Key="VsButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.ButtonFaceKey}}" />
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.ButtonTextKey}}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}" />
             <Setter Property="Padding" Value="6,3" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.ButtonHoverKey}}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource {x:Static shell:VsColors.ButtonPressedKey}}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
         
         <Style x:Key="VsTextBlockStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:VsColors.ToolWindowTextKey}}" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
             <Setter Property="FontFamily" Value="{DynamicResource VsFont.EnvironmentFontFamily}" />
             <Setter Property="FontSize" Value="{DynamicResource VsFont.EnvironmentFontSize}" />
         </Style>

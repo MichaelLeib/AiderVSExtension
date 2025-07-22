@@ -965,4 +965,51 @@ namespace AiderVSExtension.Models
 
 
     #endregion
+
+    /// <summary>
+    /// Health check results
+    /// </summary>
+    public class HealthCheckResults
+    {
+        /// <summary>
+        /// Overall health status
+        /// </summary>
+        public bool IsHealthy { get; set; }
+
+        /// <summary>
+        /// List of health check items
+        /// </summary>
+        public List<HealthCheckItem> Items { get; set; } = new List<HealthCheckItem>();
+
+        /// <summary>
+        /// Health check timestamp
+        /// </summary>
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Individual health check item
+    /// </summary>
+    public class HealthCheckItem
+    {
+        /// <summary>
+        /// Check name
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Check status
+        /// </summary>
+        public bool IsHealthy { get; set; }
+
+        /// <summary>
+        /// Check message
+        /// </summary>
+        public string Message { get; set; }
+
+        /// <summary>
+        /// Error details if any
+        /// </summary>
+        public string Error { get; set; }
+    }
 }

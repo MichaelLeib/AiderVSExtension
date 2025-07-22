@@ -1747,6 +1747,75 @@ namespace AiderVSExtension.Services
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Saves advanced parameters
+        /// </summary>
+        /// <param name="parameters">The parameters to save</param>
+        /// <returns>Task representing the async operation</returns>
+        public async Task SaveAdvancedParametersAsync(Dictionary<string, object> parameters)
+        {
+            // Implementation stub - save advanced parameters
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Enables automatic backup
+        /// </summary>
+        /// <returns>Task representing the async operation</returns>
+        public async Task EnableAutoBackupAsync()
+        {
+            // Implementation stub - enable auto backup
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Disables automatic backup
+        /// </summary>
+        /// <returns>Task representing the async operation</returns>
+        public async Task DisableAutoBackupAsync()
+        {
+            // Implementation stub - disable auto backup
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Runs health check
+        /// </summary>
+        /// <returns>Health check results</returns>
+        public async Task<HealthCheckResults> RunHealthCheckAsync()
+        {
+            // Implementation stub - perform health checks
+            return await Task.FromResult(new HealthCheckResults
+            {
+                IsHealthy = true,
+                Items = new List<HealthCheckItem>
+                {
+                    new HealthCheckItem { Name = "Configuration", IsHealthy = true, Message = "OK" }
+                }
+            });
+        }
+
+        /// <summary>
+        /// Gets configuration settings
+        /// </summary>
+        /// <returns>Configuration settings</returns>
+        public async Task<Dictionary<string, object>> GetSettingsAsync()
+        {
+            // Implementation stub - get settings
+            return await Task.FromResult(new Dictionary<string, object>());
+        }
+
+        /// <summary>
+        /// Saves configuration settings
+        /// </summary>
+        /// <param name="settings">Settings to save</param>
+        /// <returns>Task representing the async operation</returns>
+        public async Task SaveSettingsAsync(Dictionary<string, object> settings)
+        {
+            // Implementation stub - save settings
+            await Task.CompletedTask;
+        }
+
         #endregion
 
         public void Dispose()

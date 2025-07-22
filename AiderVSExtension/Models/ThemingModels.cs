@@ -326,6 +326,46 @@ namespace AiderVSExtension.Models
         public Dictionary<string, Color> Colors { get; set; } = new Dictionary<string, Color>();
 
         /// <summary>
+        /// Background color
+        /// </summary>
+        public Color BackgroundColor { get; set; }
+
+        /// <summary>
+        /// Foreground color
+        /// </summary>
+        public Color ForegroundColor { get; set; }
+
+        /// <summary>
+        /// Accent color
+        /// </summary>
+        public Color AccentColor { get; set; }
+
+        /// <summary>
+        /// Border color
+        /// </summary>
+        public Color BorderColor { get; set; }
+
+        /// <summary>
+        /// Disabled color
+        /// </summary>
+        public Color DisabledColor { get; set; }
+
+        /// <summary>
+        /// Highlight color
+        /// </summary>
+        public Color HighlightColor { get; set; }
+
+        /// <summary>
+        /// Link color
+        /// </summary>
+        public Color LinkColor { get; set; }
+
+        /// <summary>
+        /// Visited link color
+        /// </summary>
+        public Color VisitedLinkColor { get; set; }
+
+        /// <summary>
         /// Minimum contrast ratio requirements
         /// </summary>
         public double MinimumContrastRatio { get; set; } = 7.0; // WCAG AAA

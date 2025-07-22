@@ -70,7 +70,7 @@ namespace AiderVSExtension.Completion
 
                 return new CompletionStartData(
                     participation: CompletionParticipation.ProvidesItems,
-                    applicableToSpan: applicableSpan.Value);
+                    applicableToSpan: applicableSpan);
             }
             catch (Exception ex)
             {

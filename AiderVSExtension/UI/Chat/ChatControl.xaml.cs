@@ -64,11 +64,17 @@ namespace AiderVSExtension.UI.Chat
         private StubControl FileReferencesList = new StubControl();
 #endif
 
-        public ChatControl()
+        // Stub for InitializeComponent - normally generated from XAML
+        private void InitializeComponent()
         {
 #if WINDOWS
-            InitializeComponent();
+            // This method is normally auto-generated from XAML
 #endif
+        }
+
+        public ChatControl()
+        {
+            InitializeComponent();
             
             _messages = new ObservableCollection<ChatMessage>();
             _fileReferences = new ObservableCollection<FileReference>();

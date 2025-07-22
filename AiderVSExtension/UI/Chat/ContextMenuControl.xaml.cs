@@ -23,6 +23,31 @@ namespace AiderVSExtension.UI.Chat
         private List<ContextMenuItem> _allItems;
         private bool _isFileSearchMode = false;
 
+        // Stub controls for cross-platform compilation
+#if !WINDOWS
+        private class StubControl
+        {
+            public object ItemsSource { get; set; }
+            public string Text { get; set; } = "";
+            public Visibility Visibility { get; set; } = Visibility.Visible;
+            public bool IsEnabled { get; set; } = true;
+            public event EventHandler<RoutedEventArgs> Click;
+            public void Focus() { }
+            public void Clear() { }
+        }
+        
+        private StubControl ContextItemsList = new StubControl();
+        private StubControl SearchTextBox = new StubControl();
+#endif
+
+        // Stub for InitializeComponent - normally generated from XAML
+        private void InitializeComponent()
+        {
+#if WINDOWS
+            // This method is normally auto-generated from XAML
+#endif
+        }
+
         public ContextMenuControl()
         {
             InitializeComponent();

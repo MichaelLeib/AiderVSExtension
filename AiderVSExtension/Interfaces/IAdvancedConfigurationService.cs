@@ -325,5 +325,44 @@ namespace AiderVSExtension.Interfaces
         /// <param name="value">The value used</param>
         /// <returns>Task representing the async operation</returns>
         Task RecordUsageAsync(string feature, string value);
+
+        // Additional methods referenced in UI
+        /// <summary>
+        /// Saves advanced parameters
+        /// </summary>
+        /// <param name="parameters">The parameters to save</param>
+        /// <returns>Task representing the async operation</returns>
+        Task SaveAdvancedParametersAsync(Dictionary<string, object> parameters);
+
+        /// <summary>
+        /// Enables automatic backup
+        /// </summary>
+        /// <returns>Task representing the async operation</returns>
+        Task EnableAutoBackupAsync();
+
+        /// <summary>
+        /// Disables automatic backup
+        /// </summary>
+        /// <returns>Task representing the async operation</returns>
+        Task DisableAutoBackupAsync();
+
+        /// <summary>
+        /// Runs health check
+        /// </summary>
+        /// <returns>Health check results</returns>
+        Task<HealthCheckResults> RunHealthCheckAsync();
+
+        /// <summary>
+        /// Gets configuration settings
+        /// </summary>
+        /// <returns>Configuration settings</returns>
+        Task<Dictionary<string, object>> GetSettingsAsync();
+
+        /// <summary>
+        /// Saves configuration settings
+        /// </summary>
+        /// <param name="settings">Settings to save</param>
+        /// <returns>Task representing the async operation</returns>
+        Task SaveSettingsAsync(Dictionary<string, object> settings);
     }
 }

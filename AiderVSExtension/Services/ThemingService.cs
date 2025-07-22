@@ -80,14 +80,11 @@ namespace AiderVSExtension.Services
                 OperatorColor = GetThemedColor("Operator"),
                 TypeColor = GetThemedColor("UserType"),
                 MethodColor = GetThemedColor("Method"),
-                PropertyColor = GetThemedColor("Property"),
                 VariableColor = GetThemedColor("Identifier"),
                 ErrorColor = GetThemedColor("SyntaxError"),
                 WarningColor = GetThemedColor("Warning"),
                 LineNumberColor = GetThemedColor("LineNumber"),
-                SelectionColor = GetThemedColor("Selection"),
-                CaretColor = GetThemedColor("Caret"),
-                MatchedBraceColor = GetThemedColor("BraceMatching"),
+                SelectionBackgroundColor = GetThemedColor("Selection"),
                 CurrentLineColor = GetThemedColor("CurrentLine")
             };
         }
@@ -146,7 +143,7 @@ namespace AiderVSExtension.Services
         {
             if (_uiShell != null && _themeChangedCookie == 0)
             {
-                _uiShell.AdviseUIShellPropertyChanges(this, out _themeChangedCookie);
+                // _uiShell.AdviseUIShellPropertyChanges(this, out _themeChangedCookie); // Not available in VS 2022
             }
         }
 
@@ -157,7 +154,7 @@ namespace AiderVSExtension.Services
         {
             if (_uiShell != null && _themeChangedCookie != 0)
             {
-                _uiShell.UnadviseUIShellPropertyChanges(_themeChangedCookie);
+                // _uiShell.UnadviseUIShellPropertyChanges(_themeChangedCookie); // Not available in VS 2022
                 _themeChangedCookie = 0;
             }
         }

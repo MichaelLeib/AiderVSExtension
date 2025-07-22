@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using AiderVSExtension.Interfaces;
 using AiderVSExtension.Models;
 using AiderVSExtension.Security;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AiderVSExtension.Services
 {
@@ -1240,111 +1240,111 @@ namespace AiderVSExtension.Services
     // OpenAI API response models
     public class OpenAIResponse
     {
-        [JsonProperty("choices")]
+        [JsonPropertyName("choices")]
         public List<OpenAIChoice> Choices { get; set; }
 
-        [JsonProperty("usage")]
+        [JsonPropertyName("usage")]
         public OpenAIUsage Usage { get; set; }
 
-        [JsonProperty("model")]
+        [JsonPropertyName("model")]
         public string Model { get; set; }
     }
 
     public class OpenAIChoice
     {
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public OpenAIMessage Message { get; set; }
 
-        [JsonProperty("finish_reason")]
+        [JsonPropertyName("finish_reason")]
         public string FinishReason { get; set; }
     }
 
     public class OpenAIMessage
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public string Content { get; set; }
 
-        [JsonProperty("role")]
+        [JsonPropertyName("role")]
         public string Role { get; set; }
     }
 
     public class OpenAIUsage
     {
-        [JsonProperty("total_tokens")]
+        [JsonPropertyName("total_tokens")]
         public int TotalTokens { get; set; }
     }
 
     public class OpenAIModelsResponse
     {
-        [JsonProperty("data")]
+        [JsonPropertyName("data")]
         public List<OpenAIModel> Data { get; set; }
     }
 
     public class OpenAIModel
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
     }
 
     // Claude API response models
     public class ClaudeResponse
     {
-        [JsonProperty("content")]
+        [JsonPropertyName("content")]
         public List<ClaudeContent> Content { get; set; }
 
-        [JsonProperty("usage")]
+        [JsonPropertyName("usage")]
         public ClaudeUsage Usage { get; set; }
 
-        [JsonProperty("model")]
+        [JsonPropertyName("model")]
         public string Model { get; set; }
     }
 
     public class ClaudeContent
     {
-        [JsonProperty("text")]
+        [JsonPropertyName("text")]
         public string Text { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
     }
 
     public class ClaudeUsage
     {
-        [JsonProperty("input_tokens")]
+        [JsonPropertyName("input_tokens")]
         public int InputTokens { get; set; }
 
-        [JsonProperty("output_tokens")]
+        [JsonPropertyName("output_tokens")]
         public int OutputTokens { get; set; }
     }
 
     // Ollama API response models
     public class OllamaResponse
     {
-        [JsonProperty("response")]
+        [JsonPropertyName("response")]
         public string Response { get; set; }
 
-        [JsonProperty("model")]
+        [JsonPropertyName("model")]
         public string Model { get; set; }
 
-        [JsonProperty("done")]
+        [JsonPropertyName("done")]
         public bool Done { get; set; }
     }
 
     public class OllamaTagsResponse
     {
-        [JsonProperty("models")]
+        [JsonPropertyName("models")]
         public List<OllamaModel> Models { get; set; }
     }
 
     public class OllamaModel
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("modified_at")]
+        [JsonPropertyName("modified_at")]
         public DateTime ModifiedAt { get; set; }
 
-        [JsonProperty("size")]
+        [JsonPropertyName("size")]
         public long Size { get; set; }
     }
 }

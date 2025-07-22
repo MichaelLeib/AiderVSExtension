@@ -38,8 +38,7 @@ namespace AiderVSExtension.Services
             try
             {
                 // Check if AI completion is enabled
-                var config = await _configurationService.GetConfigurationAsync().ConfigureAwait(false);
-                if (!config.IsAICompletionEnabled)
+                if (!_configurationService.IsAICompletionEnabled)
                 {
                     return GetFallbackCompletions(context);
                 }
@@ -62,7 +61,7 @@ namespace AiderVSExtension.Services
             }
             catch (Exception ex)
             {
-                _errorHandler.HandleError(ex, "Error generating completions");
+                _errorHandler.HandleExceptionAsync(ex, "Error generating completions");
                 return GetFallbackCompletions(context);
             }
         }
@@ -77,8 +76,7 @@ namespace AiderVSExtension.Services
                 try
                 {
                     if (!_isEnabled) return false;
-                    var config = _configurationService.GetConfiguration();
-                    return config.IsAICompletionEnabled;
+                    return _configurationService.IsAICompletionEnabled;
                 }
                 catch
                 {
@@ -111,7 +109,7 @@ namespace AiderVSExtension.Services
             }
             catch (Exception ex)
             {
-                _errorHandler.HandleError(ex, "AI completion generation failed");
+                _errorHandler.HandleExceptionAsync(ex, "AI completion generation failed");
                 return Enumerable.Empty<CompletionItem>();
             }
         }
@@ -125,10 +123,10 @@ namespace AiderVSExtension.Services
 
 File: {context.FilePath}
 Context:
-{context.PrecedingText}
+{context.TextBeforeCursor}
 
-Current line: {context.CurrentLine}
-Cursor position: {context.Position}
+Current line: {context.TextAfterCursor}
+Cursor position: Line {context.Line}, Column {context.Column}
 
 Suggest completions for the code at the cursor position. Return up to 5 suggestions, one per line.";
 
@@ -153,14 +151,11 @@ Suggest completions for the code at the cursor position. Return up to 5 suggesti
                 {
                     completions.Add(new CompletionItem
                     {
-                        Text = line,
-                        DisplayText = line,
-                        Description = "AI-generated completion",
+                        Label = line,
                         InsertText = line,
                         Kind = CompletionItemKind.Text,
                         Priority = 100 - i, // Higher priority for first suggestions
-                        Source = "AI",
-                        IsFromAI = true
+                        Documentation = "AI-generated completion"
                     });
                 }
             }
@@ -177,35 +172,29 @@ Suggest completions for the code at the cursor position. Return up to 5 suggesti
 
             // Add common language keywords based on context
             var keywords = GetLanguageKeywords(context.Language);
-            foreach (var keyword in keywords.Where(k => k.StartsWith(context.CurrentWord, StringComparison.OrdinalIgnoreCase)))
+            foreach (var keyword in keywords.Where(k => k.StartsWith(context.TextAfterCursor, StringComparison.OrdinalIgnoreCase)))
             {
                 completions.Add(new CompletionItem
                 {
-                    Text = keyword,
-                    DisplayText = keyword,
-                    Description = $"{context.Language} keyword",
+                    Label = keyword,
                     InsertText = keyword,
                     Kind = CompletionItemKind.Keyword,
                     Priority = 50,
-                    Source = "Fallback",
-                    IsFromAI = false
+                    Documentation = $"{context.Language} keyword"
                 });
             }
 
             // Add common snippets
             var snippets = GetCommonSnippets(context.Language);
-            foreach (var snippet in snippets.Where(s => s.Trigger.StartsWith(context.CurrentWord, StringComparison.OrdinalIgnoreCase)))
+            foreach (var snippet in snippets.Where(s => s.Trigger.StartsWith(context.TextAfterCursor, StringComparison.OrdinalIgnoreCase)))
             {
                 completions.Add(new CompletionItem
                 {
-                    Text = snippet.Trigger,
-                    DisplayText = snippet.Trigger,
-                    Description = snippet.Description,
+                    Label = snippet.Trigger,
                     InsertText = snippet.Content,
                     Kind = CompletionItemKind.Snippet,
                     Priority = 40,
-                    Source = "Fallback",
-                    IsFromAI = false
+                    Documentation = snippet.Description
                 });
             }
 
@@ -217,41 +206,49 @@ Suggest completions for the code at the cursor position. Return up to 5 suggesti
         /// </summary>
         private string[] GetLanguageKeywords(string language)
         {
-            return language?.ToLowerInvariant() switch
+            var lang = language?.ToLowerInvariant();
+            switch (lang)
             {
-                "csharp" or "cs" => new[]
-                {
-                    "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked",
-                    "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else",
-                    "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for",
-                    "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock",
-                    "long", "namespace", "new", "null", "object", "operator", "out", "override", "params",
-                    "private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short",
-                    "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true",
-                    "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual",
-                    "void", "volatile", "while", "async", "await", "var"
-                },
-                "javascript" or "js" => new[]
-                {
-                    "abstract", "arguments", "boolean", "break", "byte", "case", "catch", "char", "class",
-                    "const", "continue", "debugger", "default", "delete", "do", "double", "else", "enum",
-                    "eval", "export", "extends", "false", "final", "finally", "float", "for", "function",
-                    "goto", "if", "implements", "import", "in", "instanceof", "int", "interface", "let",
-                    "long", "native", "new", "null", "package", "private", "protected", "public", "return",
-                    "short", "static", "super", "switch", "synchronized", "this", "throw", "throws",
-                    "transient", "true", "try", "typeof", "var", "void", "volatile", "while", "with", "yield"
-                },
-                "typescript" or "ts" => new[]
-                {
-                    "abstract", "any", "as", "boolean", "break", "case", "catch", "class", "const", "continue",
-                    "declare", "default", "delete", "do", "else", "enum", "export", "extends", "false",
-                    "finally", "for", "from", "function", "if", "implements", "import", "in", "instanceof",
-                    "interface", "let", "module", "namespace", "new", "null", "number", "package", "private",
-                    "protected", "public", "readonly", "return", "static", "string", "super", "switch",
-                    "this", "throw", "true", "try", "type", "typeof", "undefined", "var", "void", "while", "with", "yield"
-                },
-                _ => new string[0]
-            };
+                case "csharp":
+                case "cs":
+                    return new[]
+                    {
+                        "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked",
+                        "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else",
+                        "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for",
+                        "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock",
+                        "long", "namespace", "new", "null", "object", "operator", "out", "override", "params",
+                        "private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short",
+                        "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true",
+                        "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual",
+                        "void", "volatile", "while", "async", "await", "var"
+                    };
+                case "javascript":
+                case "js":
+                    return new[]
+                    {
+                        "abstract", "arguments", "boolean", "break", "byte", "case", "catch", "char", "class",
+                        "const", "continue", "debugger", "default", "delete", "do", "double", "else", "enum",
+                        "eval", "export", "extends", "false", "final", "finally", "float", "for", "function",
+                        "goto", "if", "implements", "import", "in", "instanceof", "int", "interface", "let",
+                        "long", "native", "new", "null", "package", "private", "protected", "public", "return",
+                        "short", "static", "super", "switch", "synchronized", "this", "throw", "throws",
+                        "transient", "true", "try", "typeof", "var", "void", "volatile", "while", "with", "yield"
+                    };
+                case "typescript":
+                case "ts":
+                    return new[]
+                    {
+                        "abstract", "any", "as", "boolean", "break", "case", "catch", "class", "const", "continue",
+                        "declare", "default", "delete", "do", "else", "enum", "export", "extends", "false",
+                        "finally", "for", "from", "function", "if", "implements", "import", "in", "instanceof",
+                        "interface", "let", "module", "namespace", "new", "null", "number", "package", "private",
+                        "protected", "public", "readonly", "return", "static", "string", "super", "switch",
+                        "this", "throw", "true", "try", "type", "typeof", "undefined", "var", "void", "while", "with", "yield"
+                    };
+                default:
+                    return new string[0];
+            }
         }
 
         /// <summary>
@@ -259,29 +256,35 @@ Suggest completions for the code at the cursor position. Return up to 5 suggesti
         /// </summary>
         private CodeSnippet[] GetCommonSnippets(string language)
         {
-            return language?.ToLowerInvariant() switch
+            var lang = language?.ToLowerInvariant();
+            switch (lang)
             {
-                "csharp" or "cs" => new[]
-                {
-                    new CodeSnippet("for", "for loop", "for (int i = 0; i < length; i++)\n{\n    \n}"),
-                    new CodeSnippet("foreach", "foreach loop", "foreach (var item in collection)\n{\n    \n}"),
-                    new CodeSnippet("if", "if statement", "if (condition)\n{\n    \n}"),
-                    new CodeSnippet("try", "try-catch block", "try\n{\n    \n}\ncatch (Exception ex)\n{\n    \n}"),
-                    new CodeSnippet("class", "class definition", "public class ClassName\n{\n    \n}"),
-                    new CodeSnippet("method", "method definition", "public void MethodName()\n{\n    \n}"),
-                    new CodeSnippet("prop", "property", "public Type PropertyName { get; set; }")
-                },
-                "javascript" or "js" => new[]
-                {
-                    new CodeSnippet("function", "function declaration", "function functionName() {\n    \n}"),
-                    new CodeSnippet("for", "for loop", "for (let i = 0; i < array.length; i++) {\n    \n}"),
-                    new CodeSnippet("foreach", "forEach loop", "array.forEach((item) => {\n    \n});"),
-                    new CodeSnippet("if", "if statement", "if (condition) {\n    \n}"),
-                    new CodeSnippet("try", "try-catch block", "try {\n    \n} catch (error) {\n    \n}"),
-                    new CodeSnippet("class", "class definition", "class ClassName {\n    constructor() {\n        \n    }\n}")
-                },
-                _ => new CodeSnippet[0]
-            };
+                case "csharp":
+                case "cs":
+                    return new[]
+                    {
+                        new CodeSnippet("for", "for loop", "for (int i = 0; i < length; i++)\n{\n    \n}"),
+                        new CodeSnippet("foreach", "foreach loop", "foreach (var item in collection)\n{\n    \n}"),
+                        new CodeSnippet("if", "if statement", "if (condition)\n{\n    \n}"),
+                        new CodeSnippet("try", "try-catch block", "try\n{\n    \n}\ncatch (Exception ex)\n{\n    \n}"),
+                        new CodeSnippet("class", "class definition", "public class ClassName\n{\n    \n}"),
+                        new CodeSnippet("method", "method definition", "public void MethodName()\n{\n    \n}"),
+                        new CodeSnippet("prop", "property", "public Type PropertyName { get; set; }")
+                    };
+                case "javascript":
+                case "js":
+                    return new[]
+                    {
+                        new CodeSnippet("function", "function declaration", "function functionName() {\n    \n}"),
+                        new CodeSnippet("for", "for loop", "for (let i = 0; i < array.length; i++) {\n    \n}"),
+                        new CodeSnippet("foreach", "forEach loop", "array.forEach((item) => {\n    \n});"),
+                        new CodeSnippet("if", "if statement", "if (condition) {\n    \n}"),
+                        new CodeSnippet("try", "try-catch block", "try {\n    \n} catch (error) {\n    \n}"),
+                        new CodeSnippet("class", "class definition", "class ClassName {\n    constructor() {\n        \n    }\n}")
+                    };
+                default:
+                    return new CodeSnippet[0];
+            }
         }
 
         /// <summary>
@@ -310,7 +313,7 @@ Suggest completions for the code at the cursor position. Return up to 5 suggesti
 
                 return new CompletionDetails
                 {
-                    DetailedDescription = item.Description ?? $"AI completion: {item.Label}",
+                    DetailedDescription = item.Documentation ?? $"AI completion: {item.Label}",
                     Documentation = item.Documentation ?? "AI-generated code completion",
                     Parameters = new List<ParameterInfo>(),
                     Examples = new List<string>(),

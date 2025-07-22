@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
@@ -44,7 +45,7 @@ namespace AiderVSExtension.Services
                     var themeId = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
                     
                     // Determine theme based on background color
-                    var luminance = GetLuminance(themeId);
+                    var luminance = GetLuminance(new Color() { R = themeId.R, G = themeId.G, B = themeId.B });
                     if (luminance > 0.5)
                         return Interfaces.VSTheme.Light;
                     else
@@ -115,7 +116,7 @@ namespace AiderVSExtension.Services
                 if (element == null) return;
 
                 // Apply basic theming
-                element.SetResourceReference(FrameworkElement.StyleProperty, VsResourceKeys.ThemedDialogDefaultStylesStyleKey);
+                element.SetResourceReference(FrameworkElement.StyleProperty, VsResourceKeys.ThemedDialogDefaultStylesKey);
                 
                 // Apply specific color resources
                 var resources = element.Resources;
@@ -127,10 +128,10 @@ namespace AiderVSExtension.Services
                 resources[SystemColors.ControlTextBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.ControlText);
                 
                 // Button colors
-                resources[SystemColors.ButtonFaceBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.ButtonBackground);
-                resources[SystemColors.ButtonTextBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.ButtonText);
+                resources[SystemColors.ControlBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.ButtonBackground);
+                resources[SystemColors.ControlTextBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.ButtonText);
                 resources[SystemColors.HighlightBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.Highlight);
-                resources[SystemColors.HighlightTextBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.HighlightText);
+                resources[SystemColors.HighlightTextBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.Highlight);
                 
                 // Border colors
                 resources[SystemColors.ActiveBorderBrushKey] = GetThemedBrush(AiderVSExtension.Interfaces.ThemeResourceKey.ActiveBorder);
@@ -158,31 +159,25 @@ namespace AiderVSExtension.Services
             {
                 return new SyntaxHighlightingTheme
                 {
-                    Background = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.EditorBackground),
-                    Foreground = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.EditorText),
+                    BackgroundColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.EditorBackground),
+                    ForegroundColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.EditorText),
                     
                     // Code highlighting colors
-                    Keyword = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Keyword),
-                    String = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.String),
-                    Comment = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Comment),
-                    Number = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Number),
-                    Operator = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Operator),
-                    Identifier = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Identifier),
+                    KeywordColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Keyword),
+                    StringColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.String),
+                    CommentColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Comment),
+                    NumberColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Number),
+                    OperatorColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Operator),
+                    VariableColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Identifier),
                     
                     // Special highlighting
-                    Error = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Error),
-                    Warning = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Warning),
-                    Information = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Information),
+                    ErrorColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Error),
+                    WarningColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Warning),
                     
                     // Line highlighting
-                    LineNumber = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.LineNumber),
-                    CurrentLine = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.CurrentLine),
-                    Selection = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Selection),
-                    
-                    // Git diff colors
-                    DiffAdded = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.DiffAdded),
-                    DiffRemoved = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.DiffRemoved),
-                    DiffModified = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.DiffModified)
+                    LineNumberColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.LineNumber),
+                    CurrentLineColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.CurrentLine),
+                    SelectionBackgroundColor = GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Selection)
                 };
             }
             catch (Exception ex)
@@ -293,63 +288,63 @@ namespace AiderVSExtension.Services
                 switch (key)
                 {
                     case AiderVSExtension.Interfaces.ThemeResourceKey.WindowBackground:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.WindowText:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.ControlBackground:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ComboBoxBackgroundColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ComboBoxBackgroundColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.ControlText:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ComboBoxTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ComboBoxTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.ButtonBackground:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ButtonFaceColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ComboBoxBackgroundColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.ButtonText:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ButtonTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ComboBoxTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Highlight:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.AccentBorderColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.AccentBorderColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.HighlightText:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.AccentPaleColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.AccentPaleColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.ActiveBorder:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ActiveBorderColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.AccentBorderColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.InactiveBorder:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.InactiveBorderColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBorderColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.GrayText:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.GrayTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.HotTrack:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.CommandBarHoverColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.CommandBarHoverColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.EditorBackground:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorBackgroundColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.EditorText:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorForegroundColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Keyword:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorKeywordColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.String:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorStringColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Comment:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorCommentColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Number:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorNumberColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Operator:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorOperatorColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Identifier:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorIdentifierColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Error:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.ErrorTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Warning:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.WarningTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Information:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.InfoTextColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.LineNumber:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorLineNumberColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.CurrentLine:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorCurrentLineColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.Selection:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.EditorSelectionColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.DiffAdded:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.DiffAddedColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.DiffRemoved:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.DiffRemovedColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     case AiderVSExtension.Interfaces.ThemeResourceKey.DiffModified:
-                        return VSColorTheme.GetThemedColor(EnvironmentColors.DiffModifiedColorKey);
+                        return ConvertToWpfColor(VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowTextColorKey));
                     default:
                         return Colors.Gray;
                 }
@@ -358,6 +353,11 @@ namespace AiderVSExtension.Services
             {
                 return Colors.Gray;
             }
+        }
+
+        private Color ConvertToWpfColor(System.Drawing.Color drawingColor)
+        {
+            return Color.FromArgb(drawingColor.A, drawingColor.R, drawingColor.G, drawingColor.B);
         }
 
         private double GetLuminance(Color color)
@@ -428,23 +428,19 @@ namespace AiderVSExtension.Services
         {
             return new SyntaxHighlightingTheme
             {
-                Background = Colors.White,
-                Foreground = Colors.Black,
-                Keyword = Colors.Blue,
-                String = Colors.Brown,
-                Comment = Colors.Green,
-                Number = Colors.Red,
-                Operator = Colors.Black,
-                Identifier = Colors.Black,
-                Error = Colors.Red,
-                Warning = Colors.Orange,
-                Information = Colors.Blue,
-                LineNumber = Colors.Gray,
-                CurrentLine = Colors.LightBlue,
-                Selection = Colors.LightBlue,
-                DiffAdded = Colors.Green,
-                DiffRemoved = Colors.Red,
-                DiffModified = Colors.Orange
+                BackgroundColor = Colors.White,
+                ForegroundColor = Colors.Black,
+                KeywordColor = Colors.Blue,
+                StringColor = Colors.Brown,
+                CommentColor = Colors.Green,
+                NumberColor = Colors.Red,
+                OperatorColor = Colors.Black,
+                VariableColor = Colors.Black,
+                ErrorColor = Colors.Red,
+                WarningColor = Colors.Orange,
+                LineNumberColor = Colors.Gray,
+                CurrentLineColor = Colors.LightBlue,
+                SelectionBackgroundColor = Colors.LightBlue
             };
         }
 

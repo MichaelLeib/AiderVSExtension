@@ -39,6 +39,12 @@
     <!-- C# Language Version -->
     <LangVersion>7.3</LangVersion>
     <Nullable>disable</Nullable>
+    
+    <!-- WPF Support - Only on Windows -->
+    <UseWPF Condition="'$(OS)' == 'Windows_NT'">true</UseWPF>
+    
+    <!-- Define WINDOWS constant for conditional compilation -->
+    <DefineConstants Condition="'$(OS)' == 'Windows_NT'">$(DefineConstants);WINDOWS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -115,6 +121,18 @@
 
   <ItemGroup>
     <!-- XAML Pages -->
+    <Compile Include="UI\Chat\ChatControl.xaml.cs" DependentUpon="ChatControl.xaml" />
+    <Compile Include="UI\Chat\ContextMenuControl.xaml.cs" DependentUpon="ContextMenuControl.xaml" />
+    <Compile Include="UI\Chat\MessageRenderer.xaml.cs" DependentUpon="MessageRenderer.xaml" />
+    <Compile Include="UI\Configuration\AdvancedConfigurationPage.xaml.cs" DependentUpon="AdvancedConfigurationPage.xaml" />
+    <Compile Include="ConfigurationPage.xaml.cs" DependentUpon="ConfigurationPage.xaml" />
+    <Compile Include="UI\AiderSetupDialog.xaml.cs" DependentUpon="AiderSetupDialog.xaml" />
+    <Compile Include="UI\Configuration\ProfileEditorDialog.xaml.cs" DependentUpon="ProfileEditorDialog.xaml" />
+    <Compile Include="UI\Configuration\TemplateEditorDialog.xaml.cs" DependentUpon="TemplateEditorDialog.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- XAML Pages -->
     <Page Include="UI\Chat\ChatControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -151,7 +169,7 @@
 
   <ItemGroup>
     <!-- Compile Items - C# Files -->
-    <Compile Include="**\*.cs" Exclude="bin\**;obj\**;Tests\**" />
+    <Compile Include="**\*.cs" Exclude="bin\**;obj\**;Tests\**;UI\**\*.xaml.cs" />
   </ItemGroup>
 
 </Project>

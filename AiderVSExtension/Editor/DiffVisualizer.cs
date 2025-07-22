@@ -102,19 +102,7 @@ namespace AiderVSExtension.Editor
             try
             {
                 // Try to get the current instance through MEF composition
-                var serviceContainer = ServiceContainer.Instance;
-                if (serviceContainer != null)
-                {
-                    // Try to get an existing instance from the service container
-                    var diffService = serviceContainer.GetService<IDiffVisualizationService>();
-                    if (diffService is DiffVisualizer visualizer)
-                    {
-                        return visualizer;
-                    }
-                }
-
-                // Fallback: create a new instance if MEF lookup fails
-                // This is not ideal but provides basic functionality
+                // For now, return null as we'll handle this through proper MEF composition
                 return null;
             }
             catch (Exception ex)

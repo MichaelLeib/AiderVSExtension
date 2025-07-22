@@ -20,13 +20,43 @@ namespace AiderVSExtension.UI
 
         public bool SetupCompleted { get; private set; } = false;
 
+        // Stub controls for non-Windows compilation
+#if !WINDOWS
+        private class StubControl
+        {
+            public string Text { get; set; } = "";
+            public Visibility Visibility { get; set; } = Visibility.Visible;
+            public Brush Fill { get; set; } = new SolidColorBrush(Colors.Gray);
+        }
+        
+        private StubControl StatusText = new StubControl();
+        private StubControl PythonStatusIndicator = new StubControl();
+        private StubControl PythonStatusText = new StubControl();
+        private StubControl PythonVersionText = new StubControl();
+        private StubControl AiderStatusIndicator = new StubControl();
+        private StubControl AiderStatusText = new StubControl();
+        private StubControl AiderVersionText = new StubControl();
+        private StubControl InstallAiderButton = new StubControl();
+        private StubControl UpgradeAiderButton = new StubControl();
+        private StubControl DependencyPanel = new StubControl();
+        private StubControl MissingDependenciesList = new StubControl();
+        private StubControl OkButton = new StubControl();
+        private StubControl CancelButton = new StubControl();
+        private StubControl CheckAgainButton = new StubControl();
+        private StubControl ProgressBar = new StubControl();
+#endif
+
         public AiderSetupDialog(IAiderDependencyChecker dependencyChecker, IErrorHandler errorHandler)
         {
+#if WINDOWS
             InitializeComponent();
+#endif
             _dependencyChecker = dependencyChecker ?? throw new ArgumentNullException(nameof(dependencyChecker));
             _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
             
+#if WINDOWS
             Loaded += AiderSetupDialog_Loaded;
+#endif
         }
 
         private async void AiderSetupDialog_Loaded(object sender, RoutedEventArgs e)
@@ -109,7 +139,7 @@ namespace AiderVSExtension.UI
             if (status.MissingDependencies?.Count > 0)
             {
                 DependencyPanel.Visibility = Visibility.Visible;
-                MissingDependenciesList.ItemsSource = status.MissingDependencies;
+                // MissingDependenciesList.ItemsSource = status.MissingDependencies;
             }
             else
             {
@@ -121,31 +151,21 @@ namespace AiderVSExtension.UI
         {
             if (status.IsPythonInstalled && status.IsAiderInstalled)
             {
-                StatusText.Text = "All dependencies are satisfied";
-                OkButton.IsEnabled = true;
-                SetupCompleted = true;
+                StatusText.Text = "All dependencies are installed and ready!";
+                OkButton.Visibility = Visibility.Visible;
+                CancelButton.Visibility = Visibility.Collapsed;
             }
-            else if (!status.IsPythonInstalled)
+            else
             {
-                StatusText.Text = "Python installation required";
-                OkButton.IsEnabled = false;
-            }
-            else if (!status.IsAiderInstalled)
-            {
-                StatusText.Text = "Aider installation required";
-                OkButton.IsEnabled = false;
-            }
-            else if (!string.IsNullOrEmpty(status.ErrorMessage))
-            {
-                StatusText.Text = $"Error: {status.ErrorMessage}";
-                OkButton.IsEnabled = false;
+                StatusText.Text = "Some dependencies need to be installed.";
+                OkButton.Visibility = Visibility.Collapsed;
+                CancelButton.Visibility = Visibility.Visible;
             }
         }
 
         private void SetProgressVisibility(bool visible)
         {
-            ProgressPanel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            InstallationProgress.IsIndeterminate = visible;
+            ProgressBar.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private async void InstallAiderButton_Click(object sender, RoutedEventArgs e)
@@ -155,33 +175,31 @@ namespace AiderVSExtension.UI
             try
             {
                 _isInstalling = true;
-                InstallAiderButton.IsEnabled = false;
+                InstallAiderButton.Visibility = Visibility.Collapsed;
+                StatusText.Text = "Installing Aider...";
                 SetProgressVisibility(true);
-                ProgressText.Text = "Installing Aider...";
-                StatusText.Text = "Installing Aider via pip...";
 
-                var success = await _dependencyChecker.InstallAiderAsync();
-
-                if (success)
+                var result = await _dependencyChecker.InstallAiderAsync();
+                if (result)
                 {
-                    StatusText.Text = "Aider installation completed successfully";
-                    await Task.Delay(1000); // Brief pause to show success
-                    await CheckDependenciesAsync(); // Refresh status
+                    StatusText.Text = "Aider installed successfully!";
+                    await CheckDependenciesAsync();
                 }
                 else
                 {
-                    StatusText.Text = "Aider installation failed. Please try manual installation.";
+                    StatusText.Text = "Failed to install Aider. Please check the error log.";
+                    InstallAiderButton.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
             {
                 await _errorHandler.LogErrorAsync("Error installing Aider", ex, "AiderSetupDialog.InstallAiderButton_Click");
-                StatusText.Text = $"Installation error: {ex.Message}";
+                StatusText.Text = $"Error installing Aider: {ex.Message}";
+                InstallAiderButton.Visibility = Visibility.Visible;
             }
             finally
             {
                 _isInstalling = false;
-                InstallAiderButton.IsEnabled = true;
                 SetProgressVisibility(false);
             }
         }
@@ -193,52 +211,49 @@ namespace AiderVSExtension.UI
             try
             {
                 _isInstalling = true;
-                UpgradeAiderButton.IsEnabled = false;
+                UpgradeAiderButton.Visibility = Visibility.Collapsed;
+                StatusText.Text = "Upgrading Aider...";
                 SetProgressVisibility(true);
-                ProgressText.Text = "Upgrading Aider...";
-                StatusText.Text = "Upgrading Aider to latest version...";
 
-                var success = await _dependencyChecker.UpgradeAiderAsync();
-
-                if (success)
+                var result = await _dependencyChecker.UpgradeAiderAsync();
+                if (result)
                 {
-                    StatusText.Text = "Aider upgrade completed successfully";
-                    await Task.Delay(1000); // Brief pause to show success
-                    await CheckDependenciesAsync(); // Refresh status
+                    StatusText.Text = "Aider upgraded successfully!";
+                    await CheckDependenciesAsync();
                 }
                 else
                 {
-                    StatusText.Text = "Aider upgrade failed. Please try manual upgrade.";
+                    StatusText.Text = "Failed to upgrade Aider. Please check the error log.";
+                    UpgradeAiderButton.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
             {
                 await _errorHandler.LogErrorAsync("Error upgrading Aider", ex, "AiderSetupDialog.UpgradeAiderButton_Click");
-                StatusText.Text = $"Upgrade error: {ex.Message}";
+                StatusText.Text = $"Error upgrading Aider: {ex.Message}";
+                UpgradeAiderButton.Visibility = Visibility.Visible;
             }
             finally
             {
                 _isInstalling = false;
-                UpgradeAiderButton.IsEnabled = true;
                 SetProgressVisibility(false);
             }
         }
 
         private async void CheckAgainButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_isInstalling) return;
             await CheckDependenciesAsync();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            SetupCompleted = true;
             Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            SetupCompleted = false;
             Close();
         }
     }

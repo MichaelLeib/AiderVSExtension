@@ -26,6 +26,20 @@ namespace AiderVSExtension.Models
         public int LineNumber { get; set; }
 
         /// <summary>
+        /// Start line number for multi-line changes (1-based)
+        /// </summary>
+        [JsonPropertyName("startLine")]
+        [Range(1, int.MaxValue, ErrorMessage = "Start line number must be greater than 0")]
+        public int StartLine { get; set; }
+
+        /// <summary>
+        /// End line number for multi-line changes (1-based)
+        /// </summary>
+        [JsonPropertyName("endLine")]
+        [Range(1, int.MaxValue, ErrorMessage = "End line number must be greater than 0")]
+        public int EndLine { get; set; }
+
+        /// <summary>
         /// Type of change (Added, Removed, Modified)
         /// </summary>
         [JsonPropertyName("type")]

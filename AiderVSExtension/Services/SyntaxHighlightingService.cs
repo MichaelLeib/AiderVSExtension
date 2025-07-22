@@ -8,6 +8,7 @@ using System.Windows;
 using AiderVSExtension.Interfaces;
 using AiderVSExtension.Models;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace AiderVSExtension.Services
 {
@@ -35,7 +36,7 @@ namespace AiderVSExtension.Services
             
             // Subscribe to theme changes
             _themingService.ThemeChanged += OnVSThemeChanged;
-            _currentTheme = _themingService.GetModels.SyntaxHighlightingTheme();
+            _currentTheme = _themingService.GetSyntaxHighlightingTheme();
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace AiderVSExtension.Services
                 if (rules == null)
                 {
                     // No syntax rules, return plain text
-                    runs.Add(new Run(text) { Foreground = new SolidColorBrush(theme.Foreground) });
+                    runs.Add(new Run(text) { Foreground = new SolidColorBrush(theme.ForegroundColor) });
                     return runs;
                 }
 
@@ -187,7 +188,7 @@ namespace AiderVSExtension.Services
                 var themes = new Dictionary<string, Models.SyntaxHighlightingTheme>(_customThemes);
                 
                 // Add VS theme
-                themes["Visual Studio"] = _themingService.GetModels.SyntaxHighlightingTheme();
+                themes["Visual Studio"] = _themingService.GetSyntaxHighlightingTheme();
                 
                 return themes;
             }
@@ -211,10 +212,10 @@ namespace AiderVSExtension.Services
                     return;
 
                 var themesPath = GetThemesDirectory();
-                var filePath = Path.Combine(themesPath, $"{name}.json");
+                var filePath = System.IO.Path.Combine(themesPath, $"{name}.json");
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(theme, Newtonsoft.Json.Formatting.Indented);
                 
-                await System.IO.File.WriteAllTextAsync(filePath, json);
+                System.IO.File.WriteAllText(filePath, json);
                 _customThemes[name] = theme;
             }
             catch (Exception ex)
@@ -274,7 +275,7 @@ namespace AiderVSExtension.Services
                 _customThemes.Remove(name);
                 
                 var themesPath = GetThemesDirectory();
-                var filePath = Path.Combine(themesPath, $"{name}.json");
+                var filePath = System.IO.Path.Combine(themesPath, $"{name}.json");
                 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -297,13 +298,17 @@ namespace AiderVSExtension.Services
         {
             try
             {
-                return format.ToLowerInvariant() switch
+                switch (format.ToLowerInvariant())
                 {
-                    "json" => Newtonsoft.Json.JsonConvert.SerializeObject(theme, Newtonsoft.Json.Formatting.Indented),
-                    "xml" => SerializeToXml(theme),
-                    "css" => ConvertToCss(theme),
-                    _ => Newtonsoft.Json.JsonConvert.SerializeObject(theme, Newtonsoft.Json.Formatting.Indented)
-                };
+                    case "json":
+                        return Newtonsoft.Json.JsonConvert.SerializeObject(theme, Newtonsoft.Json.Formatting.Indented);
+                    case "xml":
+                        return SerializeToXml(theme);
+                    case "css":
+                        return ConvertToCss(theme);
+                    default:
+                        return Newtonsoft.Json.JsonConvert.SerializeObject(theme, Newtonsoft.Json.Formatting.Indented);
+                }
             }
             catch (Exception ex)
             {
@@ -328,8 +333,8 @@ namespace AiderVSExtension.Services
                 
                 ThemeChanged?.Invoke(this, new ThemeChangedEventArgs
                 {
-                    OldTheme = VSTheme.Dark, // Would need to determine from old theme
-                    NewTheme = VSTheme.Dark,  // Would need to determine from new theme
+                    OldTheme = Interfaces.VSTheme.Dark, // Would need to determine from old theme
+                    NewTheme = Interfaces.VSTheme.Dark,  // Would need to determine from new theme
                     ChangedAt = DateTime.UtcNow
                 });
             }
@@ -374,7 +379,7 @@ namespace AiderVSExtension.Services
                     scores[lang] = 0;
                     foreach (var pattern in patterns[lang])
                     {
-                        if (text.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                        if (text.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             scores[lang]++;
                         }
@@ -448,49 +453,49 @@ namespace AiderVSExtension.Services
             // Dark theme
             _customThemes["Dark"] = new Models.SyntaxHighlightingTheme
             {
-                Background = Color.FromRgb(30, 30, 30),
-                Foreground = Color.FromRgb(220, 220, 220),
-                Keyword = Color.FromRgb(86, 156, 214),
-                String = Color.FromRgb(214, 157, 133),
-                Comment = Color.FromRgb(106, 153, 85),
-                Number = Color.FromRgb(181, 206, 168),
-                Operator = Color.FromRgb(220, 220, 220),
-                Identifier = Color.FromRgb(156, 220, 254),
-                Error = Color.FromRgb(244, 71, 71),
-                Warning = Color.FromRgb(255, 197, 61),
-                Information = Color.FromRgb(86, 156, 214)
+                BackgroundColor = Color.FromRgb(30, 30, 30),
+                ForegroundColor = Color.FromRgb(220, 220, 220),
+                KeywordColor = Color.FromRgb(86, 156, 214),
+                StringColor = Color.FromRgb(214, 157, 133),
+                CommentColor = Color.FromRgb(106, 153, 85),
+                NumberColor = Color.FromRgb(181, 206, 168),
+                OperatorColor = Color.FromRgb(220, 220, 220),
+                TypeColor = Color.FromRgb(156, 220, 254),
+                ErrorColor = Color.FromRgb(244, 71, 71),
+                WarningColor = Color.FromRgb(255, 197, 61),
+                MethodColor = Color.FromRgb(86, 156, 214)
             };
 
             // Light theme
             _customThemes["Light"] = new Models.SyntaxHighlightingTheme
             {
-                Background = Color.FromRgb(255, 255, 255),
-                Foreground = Color.FromRgb(0, 0, 0),
-                Keyword = Color.FromRgb(0, 0, 255),
-                String = Color.FromRgb(163, 21, 21),
-                Comment = Color.FromRgb(0, 128, 0),
-                Number = Color.FromRgb(0, 0, 0),
-                Operator = Color.FromRgb(0, 0, 0),
-                Identifier = Color.FromRgb(43, 145, 175),
-                Error = Color.FromRgb(255, 0, 0),
-                Warning = Color.FromRgb(255, 140, 0),
-                Information = Color.FromRgb(0, 0, 255)
+                BackgroundColor = Color.FromRgb(255, 255, 255),
+                ForegroundColor = Color.FromRgb(0, 0, 0),
+                KeywordColor = Color.FromRgb(0, 0, 255),
+                StringColor = Color.FromRgb(163, 21, 21),
+                CommentColor = Color.FromRgb(0, 128, 0),
+                NumberColor = Color.FromRgb(0, 0, 0),
+                OperatorColor = Color.FromRgb(0, 0, 0),
+                TypeColor = Color.FromRgb(43, 145, 175),
+                ErrorColor = Color.FromRgb(255, 0, 0),
+                WarningColor = Color.FromRgb(255, 140, 0),
+                MethodColor = Color.FromRgb(0, 0, 255)
             };
 
             // Monokai theme
             _customThemes["Monokai"] = new Models.SyntaxHighlightingTheme
             {
-                Background = Color.FromRgb(39, 40, 34),
-                Foreground = Color.FromRgb(248, 248, 242),
-                Keyword = Color.FromRgb(249, 38, 114),
-                String = Color.FromRgb(230, 219, 116),
-                Comment = Color.FromRgb(117, 113, 94),
-                Number = Color.FromRgb(174, 129, 255),
-                Operator = Color.FromRgb(249, 38, 114),
-                Identifier = Color.FromRgb(166, 226, 46),
-                Error = Color.FromRgb(249, 38, 114),
-                Warning = Color.FromRgb(230, 219, 116),
-                Information = Color.FromRgb(102, 217, 239)
+                BackgroundColor = Color.FromRgb(39, 40, 34),
+                ForegroundColor = Color.FromRgb(248, 248, 242),
+                KeywordColor = Color.FromRgb(249, 38, 114),
+                StringColor = Color.FromRgb(230, 219, 116),
+                CommentColor = Color.FromRgb(117, 113, 94),
+                NumberColor = Color.FromRgb(174, 129, 255),
+                OperatorColor = Color.FromRgb(249, 38, 114),
+                TypeColor = Color.FromRgb(166, 226, 46),
+                ErrorColor = Color.FromRgb(249, 38, 114),
+                WarningColor = Color.FromRgb(230, 219, 116),
+                MethodColor = Color.FromRgb(102, 217, 239)
             };
         }
 
@@ -623,17 +628,25 @@ namespace AiderVSExtension.Services
 
         private Brush GetTokenBrush(TokenType tokenType, Models.SyntaxHighlightingTheme theme)
         {
-            return tokenType switch
+            switch (tokenType)
             {
-                TokenType.Keyword => new SolidColorBrush(theme.Keyword),
-                TokenType.Type => new SolidColorBrush(theme.Keyword),
-                TokenType.String => new SolidColorBrush(theme.String),
-                TokenType.Comment => new SolidColorBrush(theme.Comment),
-                TokenType.Number => new SolidColorBrush(theme.Number),
-                TokenType.Operator => new SolidColorBrush(theme.Operator),
-                TokenType.Identifier => new SolidColorBrush(theme.Identifier),
-                _ => new SolidColorBrush(theme.Foreground)
-            };
+                case TokenType.Keyword:
+                    return new SolidColorBrush(theme.KeywordColor);
+                case TokenType.Type:
+                    return new SolidColorBrush(theme.TypeColor);
+                case TokenType.String:
+                    return new SolidColorBrush(theme.StringColor);
+                case TokenType.Comment:
+                    return new SolidColorBrush(theme.CommentColor);
+                case TokenType.Number:
+                    return new SolidColorBrush(theme.NumberColor);
+                case TokenType.Operator:
+                    return new SolidColorBrush(theme.OperatorColor);
+                case TokenType.Identifier:
+                    return new SolidColorBrush(theme.MethodColor);
+                default:
+                    return new SolidColorBrush(theme.ForegroundColor);
+            }
         }
 
         private void ApplyTokenStyling(Run run, TokenType tokenType, Models.SyntaxHighlightingTheme theme)
@@ -652,7 +665,7 @@ namespace AiderVSExtension.Services
 
         private void ApplyDocumentStyling(FlowDocument document, Models.SyntaxHighlightingTheme theme)
         {
-            document.Background = new SolidColorBrush(theme.Background);
+            document.Background = new SolidColorBrush(theme.BackgroundColor);
             document.FontFamily = new FontFamily("Consolas, 'Courier New', monospace");
             document.FontSize = 14;
             document.LineHeight = 16;
@@ -675,13 +688,38 @@ namespace AiderVSExtension.Services
         {
             try
             {
-                _currentTheme = _themingService.GetModels.SyntaxHighlightingTheme();
+                _currentTheme = _themingService.GetSyntaxHighlightingTheme();
                 ThemeChanged?.Invoke(this, e);
             }
             catch (Exception ex)
             {
                 await _errorHandler.HandleExceptionAsync(ex, "SyntaxHighlightingService.OnVSThemeChanged");
             }
+        }
+
+        private string GetThemesDirectory()
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var themesPath = System.IO.Path.Combine(appDataPath, "AiderVS", "Themes");
+            
+            if (!System.IO.Directory.Exists(themesPath))
+            {
+                System.IO.Directory.CreateDirectory(themesPath);
+            }
+            
+            return themesPath;
+        }
+
+        private string SerializeToXml(Models.SyntaxHighlightingTheme theme)
+        {
+            // Basic XML serialization - would need proper XML library for full implementation
+            return $"<SyntaxHighlightingTheme><Background>{theme.BackgroundColor}</Background><Foreground>{theme.ForegroundColor}</Foreground></SyntaxHighlightingTheme>";
+        }
+
+        private string ConvertToCss(Models.SyntaxHighlightingTheme theme)
+        {
+            // Basic CSS conversion - would need proper CSS generation for full implementation
+            return $".syntax-theme {{ background-color: {theme.BackgroundColor}; color: {theme.ForegroundColor}; }}";
         }
 
         #endregion

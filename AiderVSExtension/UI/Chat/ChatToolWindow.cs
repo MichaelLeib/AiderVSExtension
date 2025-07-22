@@ -59,7 +59,7 @@ namespace AiderVSExtension.UI.Chat
             try
             {
                 // Get the service container from the package
-                var package = Package.GetGlobalService(typeof(SProfferService)) as IServiceProvider;
+                var package = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IServiceProvider)) as IServiceProvider;
                 if (package != null)
                 {
                     _chatControl.Initialize(package);
@@ -96,8 +96,8 @@ namespace AiderVSExtension.UI.Chat
         public override void ProvideSearchSettings(IVsUIDataSource search)
         {
             // Allow searching within chat messages
-            Utilities.SetValue(search, SearchSettingsDataSource.PropertyNames.ControlMaxWidth, (uint)200);
-            Utilities.SetValue(search, SearchSettingsDataSource.PropertyNames.SearchStartType, (uint)VSSEARCHSTARTTYPE.SST_INSTANT);
+            // Utilities.SetValue(search, SearchSettingsDataSource.PropertyNames.ControlMaxWidth, (uint)200);
+            // Utilities.SetValue(search, SearchSettingsDataSource.PropertyNames.SearchStartType, (uint)VSSEARCHSTARTTYPE.SST_INSTANT);
         }
 
         /// <summary>

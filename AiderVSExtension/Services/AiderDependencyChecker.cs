@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading.Tasks;
@@ -79,31 +80,38 @@ namespace AiderVSExtension.Services
                     CreateNoWindow = true
                 };
                 
-                // Add arguments separately for security
-                startInfo.ArgumentList.Add("install");
-                startInfo.ArgumentList.Add("aider-chat");
+                // Add arguments for security
+                startInfo.Arguments = "install aider-chat";
 
-                using var process = Process.Start(startInfo);
-                if (process == null)
+                Process process = null;
+                try
                 {
-                    await _errorHandler.LogErrorAsync("Failed to start pip process", null, "AiderDependencyChecker.InstallAiderAsync");
-                    return false;
+                    process = Process.Start(startInfo);
+                    if (process == null)
+                    {
+                        await _errorHandler.LogErrorAsync("Failed to start pip process", null, "AiderDependencyChecker.InstallAiderAsync");
+                        return false;
+                    }
+
+                    var output = await process.StandardOutput.ReadToEndAsync();
+                    var error = await process.StandardError.ReadToEndAsync();
+
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                    {
+                        await _errorHandler.LogInfoAsync("Aider installation completed successfully", "AiderDependencyChecker.InstallAiderAsync");
+                        return true;
+                    }
+                    else
+                    {
+                        await _errorHandler.LogErrorAsync($"Aider installation failed. Output: {output}, Error: {error}", null, "AiderDependencyChecker.InstallAiderAsync");
+                        return false;
+                    }
                 }
-
-                var output = await process.StandardOutput.ReadToEndAsync();
-                var error = await process.StandardError.ReadToEndAsync();
-
-                await process.WaitForExitAsync();
-
-                if (process.ExitCode == 0)
+                finally
                 {
-                    await _errorHandler.LogInfoAsync("Aider installation completed successfully", "AiderDependencyChecker.InstallAiderAsync");
-                    return true;
-                }
-                else
-                {
-                    await _errorHandler.LogErrorAsync($"Aider installation failed. Output: {output}, Error: {error}", null, "AiderDependencyChecker.InstallAiderAsync");
-                    return false;
+                    process?.Dispose();
                 }
             }
             catch (Exception ex)
@@ -293,7 +301,7 @@ namespace AiderVSExtension.Services
                     {
                         var parts = command.Split(' ');
                         var fileName = parts[0];
-                        var args = parts.Length > 1 ? string.Join(" ", parts[1..]) + " --version" : "--version";
+                        var args = parts.Length > 1 ? string.Join(" ", parts.Skip(1)) + " --version" : "--version";
 
                         var startInfo = new ProcessStartInfo
                         {

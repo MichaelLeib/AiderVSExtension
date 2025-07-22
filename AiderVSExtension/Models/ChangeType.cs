@@ -21,6 +21,11 @@ namespace AiderVSExtension.Models
         /// <summary>
         /// Content was modified in the file
         /// </summary>
-        Modified = 2
+        Modified = 2,
+
+        /// <summary>
+        /// Content was deleted from the file
+        /// </summary>
+        Deleted = 3
     }
 }

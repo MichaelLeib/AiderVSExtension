@@ -66,26 +66,26 @@ namespace AiderVSExtension
         /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
         /// <param name="progress">A provider for progress updates.</param>
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
-        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData> progress)
         {
             // Report progress
-            progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Starting service container", 0, 4));
+            progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Starting service container", 0, 4));
 
             // Initialize the service container on background thread
             _serviceContainer = new AiderVSExtension.Services.ServiceContainer();
             await _serviceContainer.InitializeAsync(this, cancellationToken);
             
-            progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Service container initialized", 1, 4));
+            progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Service container initialized", 1, 4));
 
             // Initialize session management on background thread
             await InitializeSessionManagementAsync(progress, cancellationToken);
             
-            progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Session management initialized", 2, 4));
+            progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Session management initialized", 2, 4));
 
             // Initialize Aider services and dependencies on background thread
             await InitializeAiderServicesAsync(progress, cancellationToken);
             
-            progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Aider services initialized", 3, 5));
+            progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Aider services initialized", 3, 5));
 
             // Switch to UI thread only for VS service registration
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -96,10 +96,10 @@ namespace AiderVSExtension
             // Initialize command handlers (UI thread required)
             await InitializeCommandsAsync();
             
-            progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Commands initialized", 4, 5));
+            progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Commands initialized", 4, 5));
             
             // Final progress report
-            progress?.Report(new ServiceProgressData("Aider VS Extension initialized", "Extension ready", 5, 5));
+            progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Aider VS Extension initialized", "Extension ready", 5, 5));
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace AiderVSExtension
         /// <param name="progress">Progress reporter</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task representing the async operation</returns>
-        private async Task InitializeSessionManagementAsync(IProgress<ServiceProgressData> progress, CancellationToken cancellationToken)
+        private async Task InitializeSessionManagementAsync(IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData> progress, CancellationToken cancellationToken)
         {
             try
             {
@@ -141,7 +141,7 @@ namespace AiderVSExtension
                         await applicationStateService.InitializeAsync();
                     }
                     
-                    progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Session management configured", 2, 4));
+                    progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Session management configured", 2, 4));
                 }
             }
             catch (Exception ex)
@@ -157,7 +157,7 @@ namespace AiderVSExtension
         /// <param name="progress">Progress reporter</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task representing the async operation</returns>
-        private async Task InitializeAiderServicesAsync(IProgress<ServiceProgressData> progress, CancellationToken cancellationToken)
+        private async Task InitializeAiderServicesAsync(IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData> progress, CancellationToken cancellationToken)
         {
             try
             {
@@ -182,7 +182,7 @@ namespace AiderVSExtension
                     }
                 }
                 
-                progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Aider services configured", 3, 5));
+                progress?.Report(new Microsoft.VisualStudio.Shell.ServiceProgressData("Initializing Aider VS Extension services...", "Aider services configured", 3, 5));
             }
             catch (Exception ex)
             {
@@ -332,7 +332,7 @@ namespace AiderVSExtension
         /// <param name="commandId">The command ID</param>
         /// <param name="executeHandler">The execute handler</param>
         /// <param name="queryStatusHandler">The query status handler</param>
-        private void RegisterCommand(OleMenuCommandService commandService, int commandId, EventHandler executeHandler, EventHandler<OleMenuCommand> queryStatusHandler)
+        private void RegisterCommand(OleMenuCommandService commandService, int commandId, EventHandler executeHandler, EventHandler queryStatusHandler)
         {
             var menuCommandID = new CommandID(CommandSet, commandId);
             var menuCommand = new OleMenuCommand(executeHandler, menuCommandID);

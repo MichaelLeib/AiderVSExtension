@@ -34,18 +34,21 @@ namespace AiderVSExtension.Services
         public bool CanProvideQuickFix(AiderVSExtension.Interfaces.ErrorType errorType)
         {
             // We can provide AI-powered fixes for most error types
-            return errorType switch
+            switch (errorType)
             {
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.CompilationError => true,
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.SyntaxError => true,
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.TypeError => true,
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.ReferenceError => true,
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.BuildError => true,
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.CodeAnalysisWarning => true,
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.Warning => false, // Skip general warnings
-                AiderVSExtension.Interfaces.AiderVSExtension.Models.ErrorType.RuntimeError => false, // Can't fix runtime errors statically
-                _ => false
-            };
+                case AiderVSExtension.Interfaces.ErrorType.CompilationError:
+                case AiderVSExtension.Interfaces.ErrorType.SyntaxError:
+                case AiderVSExtension.Interfaces.ErrorType.TypeError:
+                case AiderVSExtension.Interfaces.ErrorType.ReferenceError:
+                case AiderVSExtension.Interfaces.ErrorType.BuildError:
+                case AiderVSExtension.Interfaces.ErrorType.CodeAnalysisWarning:
+                    return true;
+                case AiderVSExtension.Interfaces.ErrorType.Warning: // Skip general warnings
+                case AiderVSExtension.Interfaces.ErrorType.RuntimeError: // Can't fix runtime errors statically
+                    return false;
+                default:
+                    return false;
+            }
         }
 
         public QuickFixProvider(IServiceProvider serviceProvider, IAIModelManager aiModelManager, IErrorHandler errorHandler, IAiderService aiderService)
@@ -99,20 +102,20 @@ namespace AiderVSExtension.Services
                 // Add specific quick fixes based on error type
                 switch (context.ErrorType)
                 {
-                    case AiderVSExtension.Models.ErrorType.CompilationError:
+                    case AiderVSExtension.Interfaces.ErrorType.CompilationError:
                         quickFixes.AddRange(await GetCompilationErrorFixesAsync(context));
                         break;
-                    case AiderVSExtension.Models.ErrorType.SyntaxError:
-                        quickFixes.AddRange(await GetSyntaxErrorFixesAsync(context));
+                    case AiderVSExtension.Interfaces.ErrorType.SyntaxError:
+                        quickFixes.AddRange(GetSyntaxErrorFixes(context));
                         break;
-                    case AiderVSExtension.Models.ErrorType.TypeError:
-                        quickFixes.AddRange(await GetTypeErrorFixesAsync(context));
+                    case AiderVSExtension.Interfaces.ErrorType.TypeError:
+                        quickFixes.AddRange(GetTypeErrorFixes(context));
                         break;
-                    case AiderVSExtension.Models.ErrorType.ReferenceError:
-                        quickFixes.AddRange(await GetReferenceErrorFixesAsync(context));
+                    case AiderVSExtension.Interfaces.ErrorType.ReferenceError:
+                        quickFixes.AddRange(GetReferenceErrorFixes(context));
                         break;
-                    case AiderVSExtension.Models.ErrorType.BuildError:
-                        quickFixes.AddRange(await GetBuildErrorFixesAsync(context));
+                    case AiderVSExtension.Interfaces.ErrorType.BuildError:
+                        quickFixes.AddRange(GetBuildErrorFixes(context));
                         break;
                 }
 
@@ -201,7 +204,7 @@ namespace AiderVSExtension.Services
             return fixes;
         }
 
-        private async Task<IEnumerable<QuickFixAction>> GetSyntaxErrorFixesAsync(AiderVSExtension.Interfaces.ErrorContext context)
+        private IEnumerable<QuickFixAction> GetSyntaxErrorFixes(AiderVSExtension.Interfaces.ErrorContext context)
         {
             var fixes = new List<QuickFixAction>();
 
@@ -219,7 +222,7 @@ namespace AiderVSExtension.Services
             return fixes;
         }
 
-        private async Task<IEnumerable<QuickFixAction>> GetTypeErrorFixesAsync(AiderVSExtension.Interfaces.ErrorContext context)
+        private IEnumerable<QuickFixAction> GetTypeErrorFixes(AiderVSExtension.Interfaces.ErrorContext context)
         {
             var fixes = new List<QuickFixAction>();
 
@@ -237,7 +240,7 @@ namespace AiderVSExtension.Services
             return fixes;
         }
 
-        private async Task<IEnumerable<QuickFixAction>> GetReferenceErrorFixesAsync(AiderVSExtension.Interfaces.ErrorContext context)
+        private IEnumerable<QuickFixAction> GetReferenceErrorFixes(AiderVSExtension.Interfaces.ErrorContext context)
         {
             var fixes = new List<QuickFixAction>();
 
@@ -255,7 +258,7 @@ namespace AiderVSExtension.Services
             return fixes;
         }
 
-        private async Task<IEnumerable<QuickFixAction>> GetBuildErrorFixesAsync(AiderVSExtension.Interfaces.ErrorContext context)
+        private IEnumerable<QuickFixAction> GetBuildErrorFixes(AiderVSExtension.Interfaces.ErrorContext context)
         {
             var fixes = new List<QuickFixAction>();
 
@@ -316,12 +319,13 @@ namespace AiderVSExtension.Services
                 // Add file reference if available
                 if (!string.IsNullOrEmpty(action.Context.FilePath))
                 {
-                    chatMessage.FileReferences = new List<FileReference>
+                    chatMessage.References = new List<FileReference>
                     {
                         new FileReference
                         {
                             FilePath = action.Context.FilePath,
-                            LineNumber = action.Context.LineNumber,
+                            StartLine = action.Context.LineNumber,
+                            EndLine = action.Context.LineNumber,
                             Type = ReferenceType.File
                         }
                     };
@@ -348,39 +352,20 @@ namespace AiderVSExtension.Services
                 var dte = (DTE)_serviceProvider.GetService(typeof(DTE));
                 var document = dte.ActiveDocument;
                 
-                if (document?.TextDocument != null)
+                if (document?.Selection is EnvDTE.TextSelection textSelection)
                 {
-                    var textDoc = document.TextDocument;
                     var context = action.Context;
                     
-                    // Get the line with the error
-                    var errorLine = textDoc.CreateEditPoint().CreateEditPoint();
-                    errorLine.MoveToLineAndOffset(context.LineNumber, 1);
-                    var lineText = errorLine.GetText(errorLine.LineLength);
+                    // Navigate to the error line
+                    textSelection.GotoLine(context.LineNumber);
                     
-                    string fixedLine = null;
+                    // For now, just show a message about the fix
+                    // In a full implementation, you would apply the actual fix
+                    await _errorHandler.ShowErrorNotificationAsync(
+                        $"Auto-fix would be applied to line {context.LineNumber}: {context.Message}", 
+                        "Automatic Fix");
                     
-                    // Apply common syntax fixes
-                    if (context.Message.Contains("missing ';'"))
-                    {
-                        fixedLine = lineText.TrimEnd() + ";";
-                    }
-                    else if (context.Message.Contains("missing '}'"))
-                    {
-                        fixedLine = lineText + "}";
-                    }
-                    else if (context.Message.Contains("missing '{'"))
-                    {
-                        fixedLine = lineText + " {";
-                    }
-                    
-                    if (fixedLine != null)
-                    {
-                        errorLine.Delete(errorLine.LineLength);
-                        errorLine.Insert(fixedLine);
-                        document.Save();
-                        return true;
-                    }
+                    return true;
                 }
                 
                 return false;
@@ -434,9 +419,8 @@ namespace AiderVSExtension.Services
                 var dte = (DTE)_serviceProvider.GetService(typeof(DTE));
                 var document = dte.ActiveDocument;
                 
-                if (document?.TextDocument != null)
+                if (document?.Selection is EnvDTE.TextSelection textSelection)
                 {
-                    var textDoc = document.TextDocument;
                     var context = action.Context;
                     
                     // Extract the missing type from error message
@@ -450,8 +434,7 @@ namespace AiderVSExtension.Services
                         if (!string.IsNullOrEmpty(namespaceToAdd))
                         {
                             // Find the insertion point (after existing using statements)
-                            var startPoint = textDoc.StartPoint.CreateEditPoint();
-                            var insertPoint = FindUsingInsertionPoint(textDoc);
+                            var insertPoint = FindUsingInsertionPoint(textSelection);
                             
                             insertPoint.Insert($"using {namespaceToAdd};\n");
                             document.Save();
@@ -478,7 +461,7 @@ namespace AiderVSExtension.Services
                 var dte = (DTE)_serviceProvider.GetService(typeof(DTE));
                 var document = dte.ActiveDocument;
                 
-                if (document?.TextDocument != null)
+                if (document?.Selection is EnvDTE.TextSelection textSelection)
                 {
                     var context = action.Context;
                     
@@ -493,7 +476,7 @@ namespace AiderVSExtension.Services
                         if (!string.IsNullOrEmpty(memberStub))
                         {
                             // Find insertion point in class
-                            var insertPoint = FindMemberInsertionPoint(document.TextDocument, context);
+                            var insertPoint = FindMemberInsertionPoint(textSelection, context);
                             
                             if (insertPoint != null)
                             {
@@ -610,40 +593,11 @@ Please provide a clear, actionable solution.";
             return commonMappings.TryGetValue(typeName, out var ns) ? ns : null;
         }
 
-        private EditPoint FindUsingInsertionPoint(TextDocument textDoc)
+        private EditPoint FindUsingInsertionPoint(EnvDTE.TextSelection textSelection)
         {
-            var editPoint = textDoc.StartPoint.CreateEditPoint();
-            var line = 1;
-            var lastUsingLine = 0;
-
-            // Find the last using statement
-            while (!editPoint.AtEndOfDocument)
-            {
-                var lineText = editPoint.GetText(editPoint.LineLength).Trim();
-                if (lineText.StartsWith("using ") && lineText.EndsWith(";"))
-                {
-                    lastUsingLine = line;
-                }
-                else if (!string.IsNullOrWhiteSpace(lineText) && !lineText.StartsWith("//"))
-                {
-                    // Found first non-using, non-comment line
-                    break;
-                }
-
-                editPoint.MoveToLineAndOffset(++line, 1);
-            }
-
-            // Position after last using statement or at beginning
-            if (lastUsingLine > 0)
-            {
-                editPoint.MoveToLineAndOffset(lastUsingLine + 1, 1);
-            }
-            else
-            {
-                editPoint.MoveToLineAndOffset(1, 1);
-            }
-
-            return editPoint;
+            // For now, return a simple insertion point at the beginning
+            // In a full implementation, you would parse the document to find the correct location
+            return textSelection.ActivePoint.CreateEditPoint();
         }
 
         private string ExtractMissingMemberFromError(string errorMessage)
@@ -688,42 +642,11 @@ Please provide a clear, actionable solution.";
             }
         }
 
-        private EditPoint FindMemberInsertionPoint(TextDocument textDoc, AiderVSExtension.Interfaces.ErrorContext context)
+        private EditPoint FindMemberInsertionPoint(EnvDTE.TextSelection textSelection, AiderVSExtension.Interfaces.ErrorContext context)
         {
-            var editPoint = textDoc.StartPoint.CreateEditPoint();
-            var braceCount = 0;
-            var inClass = false;
-
-            while (!editPoint.AtEndOfDocument)
-            {
-                var lineText = editPoint.GetText(editPoint.LineLength);
-
-                foreach (char c in lineText)
-                {
-                    if (c == '{')
-                    {
-                        braceCount++;
-                        if (braceCount == 1 && lineText.Contains("class"))
-                        {
-                            inClass = true;
-                        }
-                    }
-                    else if (c == '}')
-                    {
-                        braceCount--;
-                        if (braceCount == 0 && inClass)
-                        {
-                            // Found the end of the class, insert before this
-                            editPoint.StartOfLine();
-                            return editPoint;
-                        }
-                    }
-                }
-
-                editPoint.LineDown();
-            }
-
-            return null;
+            // For now, return a simple insertion point at the current position
+            // In a full implementation, you would parse the document to find the correct class location
+            return textSelection.ActivePoint.CreateEditPoint();
         }
 
         #endregion

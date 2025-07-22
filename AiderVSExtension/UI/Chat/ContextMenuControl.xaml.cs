@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using AiderVSExtension.Interfaces;
 using AiderVSExtension.Services;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace AiderVSExtension.UI.Chat
 {
@@ -41,7 +43,7 @@ namespace AiderVSExtension.UI.Chat
             try
             {
                 // Get services from the global service provider
-                var serviceProvider = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(Microsoft.VisualStudio.Shell.Interop.SVsServiceProvider)) as IServiceProvider;
+                var serviceProvider = Package.GetGlobalService(typeof(IServiceProvider)) as IServiceProvider;
                 if (serviceProvider != null)
                 {
                     var serviceContainer = serviceProvider.GetService(typeof(ServiceContainer)) as ServiceContainer;
@@ -195,25 +197,45 @@ namespace AiderVSExtension.UI.Chat
 
         private string GetFileIcon(string fileExtension)
         {
-            return fileExtension?.ToLower() switch
+            if (fileExtension == null) return "📄";
+            
+            var ext = fileExtension.ToLower();
+            switch (ext)
             {
-                ".cs" => "🔷",
-                ".js" => "🟨",
-                ".ts" => "🔷",
-                ".html" => "🌐",
-                ".css" => "🎨",
-                ".json" => "📋",
-                ".xml" => "📄",
-                ".txt" => "📝",
-                ".md" => "📖",
-                ".py" => "🐍",
-                ".java" => "☕",
-                ".cpp" or ".c" => "⚡",
-                ".h" => "📋",
-                ".sql" => "🗃️",
-                ".xaml" => "🎨",
-                _ => "📄"
-            };
+                case ".cs":
+                    return "🔷";
+                case ".js":
+                    return "🟨";
+                case ".ts":
+                    return "🔷";
+                case ".html":
+                    return "🌐";
+                case ".css":
+                    return "🎨";
+                case ".json":
+                    return "📋";
+                case ".xml":
+                    return "📄";
+                case ".txt":
+                    return "📝";
+                case ".md":
+                    return "📖";
+                case ".py":
+                    return "🐍";
+                case ".java":
+                    return "☕";
+                case ".cpp":
+                case ".c":
+                    return "⚡";
+                case ".h":
+                    return "📋";
+                case ".sql":
+                    return "🗃️";
+                case ".xaml":
+                    return "🎨";
+                default:
+                    return "📄";
+            }
         }
 
         private void ContextItemsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)

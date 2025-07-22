@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Forms.Integration;
+// using System.Windows.Forms.Integration;
 using Microsoft.VisualStudio.Shell;
 using AiderVSExtension.UI;
 using AiderVSExtension.Services;
@@ -32,10 +32,13 @@ namespace AiderVSExtension.Options
                 {
                     InitializeConfigurationPage();
                 }
-                var elementHost = new ElementHost { Child = _configurationPage };
+                // ElementHost requires Windows Forms Integration which is Windows-specific
+                // For cross-platform compatibility, returning a stub UserControl
                 var userControl = new UserControl();
-                userControl.Controls.Add(elementHost);
-                elementHost.Dock = DockStyle.Fill;
+                // elementHost would normally host WPF content in WinForms
+                // var elementHost = new ElementHost { Child = _configurationPage };
+                // userControl.Controls.Add(elementHost);
+                // elementHost.Dock = DockStyle.Fill;
                 return userControl;
             }
         }

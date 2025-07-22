@@ -23,7 +23,7 @@ namespace AiderVSExtension.Services
         private readonly ConcurrentDictionary<string, PerformanceTracker> _activeTrackers = new ConcurrentDictionary<string, PerformanceTracker>();
         private readonly Timer _cleanupTimer;
         private readonly Timer _healthCheckTimer;
-        private readonly PerformanceCounter _cpuCounter;
+        private dynamic _cpuCounter; // PerformanceCounter is Windows-specific
         private readonly Process _currentProcess;
         private readonly object _lockObject = new object();
         private bool _disposed = false;
@@ -43,7 +43,15 @@ namespace AiderVSExtension.Services
             
             try
             {
-                _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                // PerformanceCounter is Windows-specific - creating dynamically
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    var perfCounterType = Type.GetType("System.Diagnostics.PerformanceCounter, System");
+                    if (perfCounterType != null)
+                    {
+                        _cpuCounter = Activator.CreateInstance(perfCounterType, "Processor", "% Processor Time", "_Total");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -807,7 +815,18 @@ namespace AiderVSExtension.Services
                     _healthCheckTimer?.Dispose();
 
                     // Dispose performance counter
-                    _cpuCounter?.Dispose();
+                    if (_cpuCounter != null)
+                    {
+                        try
+                        {
+                            var disposeMethod = _cpuCounter.GetType().GetMethod("Dispose");
+                            disposeMethod?.Invoke(_cpuCounter, null);
+                        }
+                        catch
+                        {
+                            // Ignore disposal errors
+                        }
+                    }
 
                     // Dispose process reference
                     _currentProcess?.Dispose();

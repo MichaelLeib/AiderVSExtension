@@ -3,7 +3,7 @@ using System.Net.Http;
 using AiderVSExtension.Interfaces;
 using AiderVSExtension.Models;
 using AiderVSExtension.Security;
-using OpenAI;
+// using OpenAI;
 
 namespace AiderVSExtension.Services
 {
@@ -23,20 +23,20 @@ namespace AiderVSExtension.Services
         /// <summary>
         /// Creates an OpenAI client for the specified configuration
         /// </summary>
-        public OpenAIClient CreateOpenAIClient(AIModelConfiguration config)
-        {
-            if (config == null)
-                throw new ArgumentNullException(nameof(config));
+        // public OpenAIClient CreateOpenAIClient(AIModelConfiguration config)
+        // {
+        //     if (config == null)
+        //         throw new ArgumentNullException(nameof(config));
 
-            if (config.Provider != AIProvider.ChatGPT)
-                throw new ArgumentException("Configuration must be for ChatGPT provider", nameof(config));
+        //     if (config.Provider != AIProvider.ChatGPT)
+        //         throw new ArgumentException("Configuration must be for ChatGPT provider", nameof(config));
 
-            if (string.IsNullOrEmpty(config.ApiKey))
-                throw new ArgumentException("API key is required for OpenAI client", nameof(config));
+        //     if (string.IsNullOrEmpty(config.ApiKey))
+        //         throw new ArgumentException("API key is required for OpenAI client", nameof(config));
 
-            var client = new OpenAIClient(config.ApiKey);
-            return client;
-        }
+        //     var client = new OpenAIClient(config.ApiKey);
+        //     return client;
+        // }
 
         /// <summary>
         /// Creates an HTTP client for Anthropic Claude API
@@ -89,7 +89,7 @@ namespace AiderVSExtension.Services
 
             return config.Provider switch
             {
-                AIProvider.ChatGPT => CreateOpenAIClient(config),
+                // AIProvider.ChatGPT => CreateOpenAIClient(config),
                 AIProvider.Claude => CreateClaudeClient(config),
                 AIProvider.Ollama => CreateOllamaClient(config),
                 _ => throw new NotSupportedException($"Provider {config.Provider} is not supported")

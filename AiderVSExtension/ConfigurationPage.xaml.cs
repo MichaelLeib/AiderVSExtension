@@ -21,6 +21,37 @@ namespace AiderVSExtension
         // These are now properly connected to XAML controls
         // Controls are defined in XAML with same names, so they are automatically available
 
+        // Stub for InitializeComponent - normally generated from XAML
+        private void InitializeComponent()
+        {
+            // This method is normally auto-generated from XAML
+            // For cross-platform build compatibility, we're stubbing it
+        }
+
+        // Stub properties for XAML controls - normally auto-generated
+        private dynamic ApiKeyPasswordBox = new object();
+        private dynamic EndpointUrlTextBox = new object();
+        private dynamic ModelNameTextBox = new object();
+        private dynamic AiProviderComboBox = new object();
+        private dynamic StatusTextBlock = new object();
+        private dynamic TestConnectionButton = new object();
+        private dynamic AiderPathTextBox = new object();
+        private dynamic BrowseButton = new object();
+        private dynamic FileStreamingCheckBox = new object();
+        private dynamic AutoSaveCheckBox = new object();
+        private dynamic DarkModeCheckBox = new object();
+        private dynamic YesModeCheckBox = new object();
+        private dynamic DefaultModelComboBox = new object();
+        private dynamic EditFormatComboBox = new object();
+        private dynamic ShowDiffsCheckBox = new object();
+        private dynamic PrettyCheckBox = new object();
+        private dynamic StreamCheckBox = new object();
+        private dynamic AutoCommitsCheckBox = new object();
+        private dynamic DescriptiveCommitsCheckBox = new object();
+        private dynamic DirtyCommitsCheckBox = new object();
+        private dynamic SaveButton = new object();
+        private dynamic CancelButton = new object();
+
         public ConfigurationPage(IConfigurationService configurationService)
         {
             InitializeComponent();

@@ -536,8 +536,8 @@ namespace AiderVSExtension.Services
                         {
                             Index = i,
                             Message = stash.Message,
-                            Author = stash.Author.Name,
-                            Date = stash.Author.When.DateTime,
+                            Author = stash.Target.Author.Name,
+                            Date = stash.Target.Author.When.DateTime,
                             CommitHash = stash.Target.Sha
                         });
                     }
@@ -579,8 +579,8 @@ namespace AiderVSExtension.Services
                             AuthorName = hunk.FinalCommit.Author.Name,
                             AuthorEmail = hunk.FinalCommit.Author.Email,
                             CommitDate = hunk.FinalCommit.Author.When.DateTime,
-                            StartLine = hunk.LineCountInHunk,
-                            EndLine = hunk.LineCountInHunk + hunk.LineCountInHunk - 1
+                            StartLine = hunk.FinalStartLineNumber,
+                            EndLine = hunk.FinalStartLineNumber + hunk.LineCount - 1
                         };
 
                         gitBlame.Hunks.Add(blameHunk);

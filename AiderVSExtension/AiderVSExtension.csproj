@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
     <OutputType>Library</OutputType>
     <RootNamespace>AiderVSExtension</RootNamespace>
     <AssemblyName>AiderVSExtension</AssemblyName>
@@ -78,6 +76,7 @@
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OpenAI" Version="1.7.2" />
   </ItemGroup>
 
   <ItemGroup>

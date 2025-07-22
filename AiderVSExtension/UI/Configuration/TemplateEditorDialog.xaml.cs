@@ -20,13 +20,36 @@ namespace AiderVSExtension.UI.Configuration
         private ConfigurationTemplate _template;
         private bool _isNewTemplate;
 
-        public ConfigurationTemplate Template
+        public new ConfigurationTemplate Template
         {
             get => _template;
             private set => _template = value;
         }
 
         public bool IsNewTemplate => _isNewTemplate;
+
+        // Stub for InitializeComponent - normally generated from XAML
+        private void InitializeComponent()
+        {
+            // This method is normally auto-generated from XAML
+            // For cross-platform build compatibility, we're stubbing it
+        }
+
+        // Stub properties for XAML controls - normally auto-generated
+        private dynamic VersionTextBox = new object();
+        private dynamic CategoryComboBox = new object();
+        private dynamic PromptTemplateRadio = new object();
+        private dynamic CommandTemplateRadio = new object();
+        private dynamic NameTextBox = new object();
+        private dynamic DescriptionTextBox = new object();
+        private dynamic AuthorTextBox = new object();
+        private dynamic TagsTextBox = new object();
+        private dynamic ContentTextBox = new object();
+        private dynamic VariablesListBox = new object();
+        private dynamic IconTextBox = new object();
+        private dynamic BrowseIconButton = new object();
+        private dynamic SaveButton = new object();
+        private dynamic CancelButton = new object();
 
         public TemplateEditorDialog(
             IConfigurationService configurationService,

@@ -660,36 +660,6 @@ namespace AiderVSExtension.Models
         Critical
     }
 
-    /// <summary>
-    /// Recommendation types
-    /// </summary>
-    public enum RecommendationType
-    {
-        /// <summary>
-        /// Usage-based recommendation
-        /// </summary>
-        Usage,
-
-        /// <summary>
-        /// Performance-based recommendation
-        /// </summary>
-        Performance,
-
-        /// <summary>
-        /// Configuration-based recommendation
-        /// </summary>
-        Configuration,
-
-        /// <summary>
-        /// Update recommendation
-        /// </summary>
-        Update,
-
-        /// <summary>
-        /// Security recommendation
-        /// </summary>
-        Security
-    }
 
     /// <summary>
     /// Report status

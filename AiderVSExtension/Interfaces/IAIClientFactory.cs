@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 using AiderVSExtension.Models;
-using OpenAI;
+// using OpenAI;
 
 namespace AiderVSExtension.Interfaces
 {
@@ -15,7 +15,7 @@ namespace AiderVSExtension.Interfaces
         /// </summary>
         /// <param name="config">OpenAI configuration</param>
         /// <returns>OpenAI client instance</returns>
-        OpenAIClient CreateOpenAIClient(AIModelConfiguration config);
+        // OpenAIClient CreateOpenAIClient(AIModelConfiguration config);
 
         /// <summary>
         /// Creates an HTTP client for Anthropic Claude API

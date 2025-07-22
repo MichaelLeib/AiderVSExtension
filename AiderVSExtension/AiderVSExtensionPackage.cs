@@ -72,7 +72,7 @@ namespace AiderVSExtension
             progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Starting service container", 0, 4));
 
             // Initialize the service container on background thread
-            _serviceContainer = new ServiceContainer();
+            _serviceContainer = new AiderVSExtension.Services.ServiceContainer();
             await _serviceContainer.InitializeAsync(this, cancellationToken);
             
             progress?.Report(new ServiceProgressData("Initializing Aider VS Extension services...", "Service container initialized", 1, 4));
@@ -111,7 +111,7 @@ namespace AiderVSExtension
 
             // Register our service container as a service
             var serviceContainer = GetService(typeof(IServiceContainer)) as IServiceContainer;
-            serviceContainer?.AddService(typeof(ServiceContainer), _serviceContainer, true);
+            serviceContainer?.AddService(typeof(AiderVSExtension.Services.ServiceContainer), _serviceContainer, true);
         }
 
         /// <summary>
@@ -449,7 +449,7 @@ namespace AiderVSExtension
 
         private async void ExecuteToggleAICompletionCommand(object sender, EventArgs e)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             try
             {
                 // Toggle AI completion feature

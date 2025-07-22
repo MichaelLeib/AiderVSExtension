@@ -11,7 +11,7 @@ namespace AiderVSExtension.Services
     /// </summary>
     public class ErrorMessageParser
     {
-        private static readonly List<ErrorPattern> ErrorPatterns = new()
+        private static readonly List<ErrorPattern> ErrorPatterns = new List<ErrorPattern>()
         {
             // Visual Studio C# Compiler Errors
             new ErrorPattern(
@@ -21,10 +21,10 @@ namespace AiderVSExtension.Services
                     FilePath = m.Groups[1].Value,
                     LineNumber = int.Parse(m.Groups[2].Value),
                     ColumnNumber = int.Parse(m.Groups[3].Value),
-                    ErrorType = m.Groups[4].Value.ToLower() == "error" ? AiderVSExtension.Models.ErrorType.CompilationError : AiderVSExtension.Models.ErrorType.Warning,
+                    ErrorType = m.Groups[4].Value.ToLower() == "error" ? ErrorType.CompileError : ErrorType.Warning,
                     ErrorCode = m.Groups[5].Value,
-                    Message = m.Groups[6].Value,
-                    ErrorSpan = m.Groups[0].Value
+                    ErrorMessage = m.Groups[6].Value,
+                    Properties = new Dictionary<string, object> { { "ErrorSpan", m.Groups[0].Value } }
                 }),
 
             // MSBuild Errors
@@ -35,10 +35,10 @@ namespace AiderVSExtension.Services
                     FilePath = m.Groups[1].Value,
                     LineNumber = int.Parse(m.Groups[2].Value),
                     ColumnNumber = 0,
-                    ErrorType = m.Groups[3].Value.ToLower() == "error" ? AiderVSExtension.Models.ErrorType.BuildError : AiderVSExtension.Models.ErrorType.Warning,
+                    ErrorType = m.Groups[3].Value.ToLower() == "error" ? ErrorType.CompileError : ErrorType.Warning,
                     ErrorCode = m.Groups[4].Value,
-                    Message = m.Groups[5].Value,
-                    ErrorSpan = m.Groups[0].Value
+                    ErrorMessage = m.Groups[5].Value,
+                    Properties = new Dictionary<string, object> { { "ErrorSpan", m.Groups[0].Value } }
                 }),
 
             // NuGet Package Errors
@@ -49,10 +49,10 @@ namespace AiderVSExtension.Services
                     FilePath = "",
                     LineNumber = 0,
                     ColumnNumber = 0,
-                    ErrorType = AiderVSExtension.Models.ErrorType.BuildError,
+                    ErrorType = ErrorType.CompileError,
                     ErrorCode = m.Groups[1].Value,
-                    Message = m.Groups[2].Value,
-                    ErrorSpan = m.Groups[0].Value
+                    ErrorMessage = m.Groups[2].Value,
+                    Properties = new Dictionary<string, object> { { "ErrorSpan", m.Groups[0].Value } }
                 }),
 
             // Generic Error Pattern
@@ -63,10 +63,10 @@ namespace AiderVSExtension.Services
                     FilePath = "",
                     LineNumber = 0,
                     ColumnNumber = 0,
-                    ErrorType = AiderVSExtension.Models.ErrorType.Unknown,
+                    ErrorType = ErrorType.CompileError,
                     ErrorCode = "",
-                    Message = m.Groups[1].Value,
-                    ErrorSpan = m.Groups[0].Value
+                    ErrorMessage = m.Groups[1].Value,
+                    Properties = new Dictionary<string, object> { { "ErrorSpan", m.Groups[0].Value } }
                 }),
 
             // Warning Pattern
@@ -77,10 +77,10 @@ namespace AiderVSExtension.Services
                     FilePath = "",
                     LineNumber = 0,
                     ColumnNumber = 0,
-                    ErrorType = AiderVSExtension.Models.ErrorType.Warning,
+                    ErrorType = ErrorType.Warning,
                     ErrorCode = "",
-                    Message = m.Groups[1].Value,
-                    ErrorSpan = m.Groups[0].Value
+                    ErrorMessage = m.Groups[1].Value,
+                    Properties = new Dictionary<string, object> { { "ErrorSpan", m.Groups[0].Value } }
                 })
         };
 
@@ -164,7 +164,7 @@ namespace AiderVSExtension.Services
         {
             if (string.IsNullOrWhiteSpace(errorMessage))
             {
-                return AiderVSExtension.Models.ErrorType.Unknown;
+                return ErrorType.CompileError;
             }
 
             var message = errorMessage.ToLower();
@@ -177,54 +177,54 @@ namespace AiderVSExtension.Services
                 // C# Compiler errors
                 if (code.StartsWith("CS"))
                 {
-                    return AiderVSExtension.Models.ErrorType.CompilationError;
+                    return ErrorType.CompileError;
                 }
                 
                 // MSBuild errors
                 if (code.StartsWith("MSB"))
                 {
-                    return AiderVSExtension.Models.ErrorType.BuildError;
+                    return ErrorType.CompileError;
                 }
                 
                 // NuGet errors
                 if (code.StartsWith("NU"))
                 {
-                    return AiderVSExtension.Models.ErrorType.BuildError;
+                    return ErrorType.CompileError;
                 }
             }
 
             // Check message content patterns
             if (message.Contains("syntax error") || message.Contains("expected") || message.Contains("unexpected"))
             {
-                return AiderVSExtension.Models.ErrorType.SyntaxError;
+                return ErrorType.SyntaxError;
             }
             
             if (message.Contains("type") && (message.Contains("cannot convert") || message.Contains("cannot implicitly")))
             {
-                return AiderVSExtension.Models.ErrorType.TypeError;
+                return ErrorType.SemanticError;
             }
             
             if (message.Contains("does not exist") || message.Contains("not found") || message.Contains("could not be found"))
             {
-                return AiderVSExtension.Models.ErrorType.ReferenceError;
+                return ErrorType.SemanticError;
             }
             
             if (message.Contains("build failed") || message.Contains("build error"))
             {
-                return AiderVSExtension.Models.ErrorType.BuildError;
+                return ErrorType.CompileError;
             }
             
             if (message.Contains("runtime error") || message.Contains("exception"))
             {
-                return AiderVSExtension.Models.ErrorType.RuntimeError;
+                return ErrorType.RuntimeError;
             }
             
             if (message.Contains("warning"))
             {
-                return AiderVSExtension.Models.ErrorType.Warning;
+                return ErrorType.Warning;
             }
 
-            return AiderVSExtension.Models.ErrorType.CompilationError; // Default for most development errors
+            return ErrorType.CompileError; // Default for most development errors
         }
 
         /// <summary>
@@ -272,18 +272,35 @@ namespace AiderVSExtension.Services
         /// </summary>
         public ErrorSeverity GetErrorSeverity(ErrorType errorType)
         {
-            return errorType switch
+            switch (errorType)
             {
-                AiderVSExtension.Models.ErrorType.CompilationError => ErrorSeverity.Error,
-                AiderVSExtension.Models.ErrorType.SyntaxError => ErrorSeverity.Error,
-                AiderVSExtension.Models.ErrorType.TypeError => ErrorSeverity.Error,
-                AiderVSExtension.Models.ErrorType.ReferenceError => ErrorSeverity.Error,
-                AiderVSExtension.Models.ErrorType.BuildError => ErrorSeverity.Error,
-                AiderVSExtension.Models.ErrorType.RuntimeError => ErrorSeverity.Error,
-                AiderVSExtension.Models.ErrorType.Warning => ErrorSeverity.Warning,
-                AiderVSExtension.Models.ErrorType.CodeAnalysisWarning => ErrorSeverity.Warning,
-                _ => ErrorSeverity.Info
-            };
+                case ErrorType.CompileError:
+                    return ErrorSeverity.Error;
+                case ErrorType.SyntaxError:
+                    return ErrorSeverity.Error;
+                case ErrorType.SemanticError:
+                    return ErrorSeverity.Error;
+                case ErrorType.RuntimeError:
+                    return ErrorSeverity.Error;
+                case ErrorType.Warning:
+                    return ErrorSeverity.Warning;
+                case ErrorType.ConfigurationError:
+                    return ErrorSeverity.Error;
+                case ErrorType.NetworkError:
+                    return ErrorSeverity.Error;
+                case ErrorType.FileSystemError:
+                    return ErrorSeverity.Error;
+                case ErrorType.ValidationError:
+                    return ErrorSeverity.Error;
+                case ErrorType.PerformanceIssue:
+                    return ErrorSeverity.Warning;
+                case ErrorType.SecurityIssue:
+                    return ErrorSeverity.Error;
+                case ErrorType.AccessibilityIssue:
+                    return ErrorSeverity.Warning;
+                default:
+                    return ErrorSeverity.Info;
+            }
         }
 
         /// <summary>
@@ -297,20 +314,20 @@ namespace AiderVSExtension.Services
             }
 
             // Set project name if not already set
-            if (string.IsNullOrEmpty(errorContext.ProjectName) && !string.IsNullOrEmpty(errorContext.FilePath))
+            if (string.IsNullOrEmpty(errorContext.Source) && !string.IsNullOrEmpty(errorContext.FilePath))
             {
-                errorContext.ProjectName = ExtractProjectName(errorContext.FilePath);
+                errorContext.Source = ExtractProjectName(errorContext.FilePath);
             }
 
             // Re-categorize error type if it's unknown
-            if (errorContext.ErrorType == AiderVSExtension.Models.ErrorType.Unknown)
+            if (errorContext.ErrorType == ErrorType.CompileError && string.IsNullOrEmpty(errorContext.ErrorCode))
             {
-                errorContext.ErrorType = CategorizeError(errorContext.Message, errorContext.ErrorCode);
+                errorContext.ErrorType = CategorizeError(errorContext.ErrorMessage, errorContext.ErrorCode);
             }
 
-            // Add additional context to dictionary
-            errorContext.AdditionalContext["Severity"] = GetErrorSeverity(errorContext.ErrorType).ToString();
-            errorContext.AdditionalContext["ParsedAt"] = DateTime.UtcNow.ToString("O");
+            // Add additional context to properties
+            errorContext.Properties["Severity"] = GetErrorSeverity(errorContext.ErrorType).ToString();
+            errorContext.Properties["ParsedAt"] = DateTime.UtcNow.ToString("O");
         }
     }
 

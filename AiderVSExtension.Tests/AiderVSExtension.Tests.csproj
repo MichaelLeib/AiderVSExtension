@@ -30,7 +30,6 @@
     
     <!-- Performance Testing -->
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-    <PackageReference Include="NBomber" Version="6.0.0" />
     
     <!-- System Packages - Aligned with main project -->
     <PackageReference Include="System.Text.Json" Version="6.0.10" />

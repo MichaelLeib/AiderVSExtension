@@ -131,6 +131,11 @@ namespace AiderVSExtension.Models
         public bool IsSuccess { get; set; }
 
         /// <summary>
+        /// Alias for IsSuccess for backward compatibility
+        /// </summary>
+        public bool IsSuccessful => IsSuccess;
+
+        /// <summary>
         /// Error message if operation failed
         /// </summary>
         public string ErrorMessage { get; set; }

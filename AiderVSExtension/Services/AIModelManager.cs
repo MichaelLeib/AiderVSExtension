@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using AiderVSExtension.Interfaces;
 using AiderVSExtension.Models;
 using AiderVSExtension.Security;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace AiderVSExtension.Services
 {
@@ -99,7 +99,6 @@ namespace AiderVSExtension.Services
             
             return true;
         }
-
 
         public async Task<CompletionResponse> GetCompletionAsync(CompletionRequest request)
         {
@@ -199,18 +198,18 @@ namespace AiderVSExtension.Services
                 switch (_activeModel.Provider)
                 {
                     case AIProvider.ChatGPT:
-                        return await SendOpenAIChatAsync(messages);
+                        return await SendOpenAIChat(messages);
                     case AIProvider.Claude:
-                        return await SendClaudeChatAsync(messages);
+                        return await SendClaudeChat(messages);
                     case AIProvider.Ollama:
-                        return await SendOllamaChatAsync(messages);
+                        return await SendOllamaChat(messages);
                     default:
                         return new ChatResponse
                         {
                             IsSuccess = false,
                             ErrorMessage = $"Unsupported provider: {_activeModel.Provider}"
                         };
-                };
+                }
             }
             catch (Exception ex)
             {
@@ -235,10 +234,10 @@ namespace AiderVSExtension.Services
                 }
 
                 // Test connection by making a simple models list request
-                using (var httpRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.openai.com/v1/models"))
+                using (var httpClient = new HttpClient())
                 {
-                    httpRequest.Headers.Add("Authorization", $"Bearer {modelConfig.ApiKey}");
-                    var response = await _httpClient.SendAsync(httpRequest);
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {modelConfig.ApiKey}");
+                    var response = await httpClient.GetAsync("https://api.openai.com/v1/models");
                     return ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300);
                 }
             }
@@ -277,8 +276,9 @@ namespace AiderVSExtension.Services
                     httpRequest.Headers.Add("x-api-key", modelConfig.ApiKey);
                     httpRequest.Headers.Add("anthropic-version", "2023-06-01");
                     httpRequest.Content = content;
+
                     var response = await _httpClient.SendAsync(httpRequest);
-                    return (int)response.StatusCode >= 200 && (int)response.StatusCode < 300;
+                    return ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300);
                 }
             }
             catch (Exception ex)
@@ -302,7 +302,7 @@ namespace AiderVSExtension.Services
                 using (var request = new HttpRequestMessage(HttpMethod.Get, tagsUrl))
                 {
                     var response = await _httpClient.SendAsync(request);
-                    return (int)response.StatusCode >= 200 && (int)response.StatusCode < 300;
+                    return ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300);
                 }
             }
             catch (Exception ex)
@@ -327,6 +327,7 @@ namespace AiderVSExtension.Services
 
                 var startTime = DateTime.UtcNow;
 
+                // Build the chat completion request using HTTP
                 var requestData = new
                 {
                     model = _activeModel.ModelName ?? "gpt-3.5-turbo",
@@ -426,7 +427,7 @@ namespace AiderVSExtension.Services
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseTime = DateTime.UtcNow - startTime;
 
-                    if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
                     {
                         var claudeResponse = SecureJsonSerializer.Deserialize<ClaudeResponse>(responseContent, strict: true);
                         
@@ -497,7 +498,7 @@ namespace AiderVSExtension.Services
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseTime = DateTime.UtcNow - startTime;
 
-                    if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
                     {
                         var ollamaResponse = SecureJsonSerializer.Deserialize<OllamaResponse>(responseContent, strict: true);
                         
@@ -529,7 +530,7 @@ namespace AiderVSExtension.Services
             }
         }
 
-        private async Task<ChatResponse> SendOpenAIChatMessageAsync(ChatMessage message)
+        private async Task<ChatResponse> SendOpenAIChatMessageAsync(AiderVSExtension.Models.ChatMessage message)
         {
             try
             {
@@ -544,7 +545,7 @@ namespace AiderVSExtension.Services
 
                 var startTime = DateTime.UtcNow;
 
-                // Build messages array with file context
+                // Convert our ChatMessage to OpenAI format
                 var messages = new List<object>
                 {
                     new { role = "system", content = "You are a helpful coding assistant integrated into Visual Studio." },
@@ -626,7 +627,7 @@ namespace AiderVSExtension.Services
             }
         }
 
-        private async Task<ChatResponse> SendClaudeChatMessageAsync(ChatMessage message)
+        private async Task<ChatResponse> SendClaudeChatMessageAsync(AiderVSExtension.Models.ChatMessage message)
         {
             try
             {
@@ -679,32 +680,32 @@ namespace AiderVSExtension.Services
                     httpRequest.Headers.Add("anthropic-version", "2023-06-01");
                     httpRequest.Content = content;
 
-					var response = await _httpClient.SendAsync(httpRequest);
-					var responseContent = await response.Content.ReadAsStringAsync();
-					var responseTime = DateTime.UtcNow - startTime;
+                    var response = await _httpClient.SendAsync(httpRequest);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var responseTime = DateTime.UtcNow - startTime;
 
-					if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
-					{
-						var claudeResponse = SecureJsonSerializer.Deserialize<ClaudeResponse>(responseContent, strict: true);
-						
-						return new ChatResponse
-						{
-							IsSuccess = true,
-							Content = claudeResponse?.Content?.FirstOrDefault()?.Text ?? "",
-							ModelUsed = _activeModel.ModelName,
-							TokensUsed = claudeResponse?.Usage?.OutputTokens ?? 0,
-							ResponseTime = responseTime,
-							OriginalRequest = message.Content,
-							ResponseType = ChatResponseType.Text
-						};
-					}
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
+                    {
+                        var claudeResponse = SecureJsonSerializer.Deserialize<ClaudeResponse>(responseContent, strict: true);
+                        
+                        return new ChatResponse
+                        {
+                            IsSuccess = true,
+                            Content = claudeResponse?.Content?.FirstOrDefault()?.Text ?? "",
+                            ModelUsed = _activeModel.ModelName,
+                            TokensUsed = claudeResponse?.Usage?.OutputTokens ?? 0,
+                            ResponseTime = responseTime,
+                            OriginalRequest = message.Content,
+                            ResponseType = ChatResponseType.Text
+                        };
+                    }
 
-					return new ChatResponse
-					{
-						IsSuccess = false,
-						ErrorMessage = $"Claude API error: {response.StatusCode} - {responseContent}",
-						ResponseType = ChatResponseType.Error
-					};
+                    return new ChatResponse
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = $"Claude API error: {response.StatusCode} - {responseContent}",
+                        ResponseType = ChatResponseType.Error
+                    };
                 }
             }
             catch (Exception ex)
@@ -719,7 +720,7 @@ namespace AiderVSExtension.Services
             }
         }
 
-        private async Task<ChatResponse> SendOllamaChatMessageAsync(ChatMessage message)
+        private async Task<ChatResponse> SendOllamaChatMessageAsync(AiderVSExtension.Models.ChatMessage message)
         {
             try
             {
@@ -774,30 +775,30 @@ namespace AiderVSExtension.Services
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseTime = DateTime.UtcNow - startTime;
 
-					if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
-					{
-						var ollamaResponse = SecureJsonSerializer.Deserialize<OllamaResponse>(responseContent, strict: true);
-						
-						return new ChatResponse
-						{
-							IsSuccess = true,
-							Content = ollamaResponse?.Response ?? "",
-							ModelUsed = _activeModel.ModelName,
-							TokensUsed = 0, // Ollama doesn't return token count in basic API
-							ResponseTime = responseTime,
-							OriginalRequest = message.Content,
-							ResponseType = ChatResponseType.Text
-						};
-					}
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
+                    {
+                        var ollamaResponse = SecureJsonSerializer.Deserialize<OllamaResponse>(responseContent, strict: true);
+                        
+                        return new ChatResponse
+                        {
+                            IsSuccess = true,
+                            Content = ollamaResponse?.Response ?? "",
+                            ModelUsed = _activeModel.ModelName,
+                            TokensUsed = 0, // Ollama doesn't return token count in basic API
+                            ResponseTime = responseTime,
+                            OriginalRequest = message.Content,
+                            ResponseType = ChatResponseType.Text
+                        };
+                    }
 
-					return new ChatResponse
-					{
-						IsSuccess = false,
-						ErrorMessage = $"Ollama API error: {response.StatusCode} - {responseContent}",
-						ResponseType = ChatResponseType.Error
-					};
-            	}
-			}
+                    return new ChatResponse
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = $"Ollama API error: {response.StatusCode} - {responseContent}",
+                        ResponseType = ChatResponseType.Error
+                    };
+                }
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Ollama chat failed: {ex.Message}");
@@ -810,7 +811,7 @@ namespace AiderVSExtension.Services
             }
         }
 
-        private async Task<ChatResponse> SendOpenAIChatAsync(IEnumerable<ChatMessage> messages)
+        private async Task<ChatResponse> SendOpenAIChat(IEnumerable<AiderVSExtension.Models.ChatMessage> messages)
         {
             try
             {
@@ -829,15 +830,13 @@ namespace AiderVSExtension.Services
                 foreach (var message in messages)
                 {
                     var role = message.Type == MessageType.User ? "user" : "assistant";
-                    chatMessages.Add(new { role, content = message.Content });
+                    chatMessages.Add(new { role = role, content = message.Content });
                 }
 
                 var requestData = new
                 {
                     model = _activeModel.ModelName ?? "gpt-3.5-turbo",
-                    messages = chatMessages,
-                    max_tokens = 1000,
-                    temperature = 0.7
+                    messages = chatMessages
                 };
 
                 var json = SecureJsonSerializer.Serialize(requestData);
@@ -852,7 +851,7 @@ namespace AiderVSExtension.Services
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseTime = DateTime.UtcNow - startTime;
 
-                    if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
                     {
                         var openaiResponse = SecureJsonSerializer.Deserialize<OpenAIResponse>(responseContent, strict: true);
                         
@@ -862,34 +861,33 @@ namespace AiderVSExtension.Services
                             return new ChatResponse
                             {
                                 IsSuccess = true,
-                                Content = choice.Message.Content?.ToString(),
+                                Content = choice.Message?.Content ?? "",
                                 ResponseTime = responseTime,
                                 ModelUsed = _activeModel.ModelName,
                                 ResponseType = ChatResponseType.Text
                             };
                         }
-                                         }
+                    }
 
-                     return new ChatResponse
-                     {
-                         IsSuccess = false,
-                         ErrorMessage = $"OpenAI API error: {response.StatusCode} - {responseContent}",
-                         ResponseType = ChatResponseType.Error
-                     };
-                 }
-             }
-             catch (Exception ex)
-             {
-                 return new ChatResponse
-                 {
-                     IsSuccess = false,
-                     ErrorMessage = ex.Message,
-                     ResponseType = ChatResponseType.Error
-                 };
-             }
-         }
+                    return new ChatResponse
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "No response from OpenAI"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ChatResponse
+                {
+                    IsSuccess = false,
+                    ErrorMessage = ex.Message,
+                    ResponseType = ChatResponseType.Error
+                };
+            }
+        }
 
-        private async Task<ChatResponse> SendClaudeChatAsync(IEnumerable<ChatMessage> messages)
+        private async Task<ChatResponse> SendClaudeChat(IEnumerable<AiderVSExtension.Models.ChatMessage> messages)
         {
             // For now, just use the first message - full conversation support would require more work
             var firstMessage = messages.FirstOrDefault();
@@ -905,7 +903,7 @@ namespace AiderVSExtension.Services
             return await SendClaudeChatMessageAsync(firstMessage);
         }
 
-        private async Task<ChatResponse> SendOllamaChatAsync(IEnumerable<ChatMessage> messages)
+        private async Task<ChatResponse> SendOllamaChat(IEnumerable<AiderVSExtension.Models.ChatMessage> messages)
         {
             // For now, just use the first message - full conversation support would require more work  
             var firstMessage = messages.FirstOrDefault();
@@ -995,14 +993,17 @@ namespace AiderVSExtension.Services
             {
                 System.Diagnostics.Debug.WriteLine($"Error getting models for provider {provider}: {ex.Message}");
                 // Return default models on error
-                if (provider == AIProvider.ChatGPT)
-                    return new[] { "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo" };
-                else if (provider == AIProvider.Claude)
-                    return new[] { "claude-3-opus", "claude-3-sonnet", "claude-3-haiku" };
-                else if (provider == AIProvider.Ollama)
-                    return new[] { "llama2", "codellama", "mistral" };
-                else
-                    return Enumerable.Empty<string>();
+                switch (provider)
+                {
+                    case AIProvider.ChatGPT:
+                        return new[] { "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo" };
+                    case AIProvider.Claude:
+                        return new[] { "claude-3-opus", "claude-3-sonnet", "claude-3-haiku" };
+                    case AIProvider.Ollama:
+                        return new[] { "llama2", "codellama", "mistral" };
+                    default:
+                        return Enumerable.Empty<string>();
+                }
             }
         }
 
@@ -1016,12 +1017,29 @@ namespace AiderVSExtension.Services
                     return new[] { "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo" };
                 }
 
-                using (var httpRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.openai.com/v1/models"))
+                using (var httpClient = new HttpClient())
                 {
-                    httpRequest.Headers.Add("Authorization", $"Bearer {config.ApiKey}");
-                    var response = await _httpClient.SendAsync(httpRequest);
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var modelsResponse = SecureJsonSerializer.Deserialize<dynamic>(responseContent, strict: true);
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {config.ApiKey}");
+                    var response = await httpClient.GetAsync("https://api.openai.com/v1/models");
+                    
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var modelsResponse = SecureJsonSerializer.Deserialize<OpenAIModelsResponse>(content, strict: true);
+                        
+                        // Filter to only chat models
+                        var chatModels = modelsResponse?.Data?
+                            .Where(m => m.Id.Contains("gpt"))
+                            .OrderByDescending(m => m.Id)
+                            .Select(m => m.Id)
+                            .ToList();
+
+                        if (chatModels?.Any() == true)
+                        {
+                            return chatModels;
+                        }
+                        return new[] { "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo" };
+                    }
                 }
 
                 return new[] { "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo" };
@@ -1044,23 +1062,44 @@ namespace AiderVSExtension.Services
                 }
 
                 // Use HTTP client to fetch available models from Claude API
-                using (var httpRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.anthropic.com/v1/models"))
+                using (var httpClient = new HttpClient())
                 {
-                    httpRequest.Headers.Add("x-api-key", config.ApiKey);
-                    httpRequest.Headers.Add("anthropic-version", "2023-06-01");
-                    var response = await _httpClient.SendAsync(httpRequest);
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var modelsResponse = SecureJsonSerializer.Deserialize<dynamic>(responseContent, strict: true);
+                    httpClient.DefaultRequestHeaders.Add("x-api-key", config.ApiKey);
+                    httpClient.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+
+                    var response = await httpClient.GetAsync("https://api.anthropic.com/v1/models");
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var modelsResponse = SecureJsonSerializer.Deserialize<dynamic>(content, strict: true);
+                        
+                        if (modelsResponse?.data != null)
+                        {
+                            var models = new List<string>();
+                            foreach (var model in modelsResponse.data)
+                            {
+                                if (model?.id != null)
+                                {
+                                    models.Add(model.id.ToString());
+                                }
+                            }
+                            
+                            if (models.Any())
+                            {
+                                return models;
+                            }
+                        }
+                    }
                 }
 
-                return new[] { "claude-4-sonnet", "claude-4-sonnet-20250219", "claude-4-opus-20250219", "claude-4-haiku-20250219" };
-                //return new[] { "claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307" };
+                // Fallback to known models if API call fails
+                return new[] { "claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307" };
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error getting Claude models: {ex.Message}");
-                return new[] { "claude-4-sonnet", "claude-4-sonnet-20250219", "claude-4-opus-20250219", "claude-4-haiku-20250219" };
-                //return new[] { "claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307" };
+                await _errorHandler.LogWarningAsync($"Failed to fetch Claude models: {ex.Message}", "AIModelManager.GetClaudeModelsAsync");
+                // Return default models on error
+                return new[] { "claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307" };
             }
         }
 
@@ -1078,11 +1117,25 @@ namespace AiderVSExtension.Services
                 using (var request = new HttpRequestMessage(HttpMethod.Get, tagsUrl))
                 {
                     var response = await _httpClient.SendAsync(request);
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var tagsResponse = SecureJsonSerializer.Deserialize<OllamaTagsResponse>(responseContent, strict: true);
-
-                    return tagsResponse?.Models?.Select(m => m.Name) ?? new[] { "llama2", "codellama", "mistral" };
+                    if (((int)response.StatusCode >= 200 && (int)response.StatusCode < 300))
+                    {
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        var tagsResponse = SecureJsonSerializer.Deserialize<OllamaTagsResponse>(responseContent, strict: true);
+                        
+                        var models = tagsResponse?.Models?
+                            .Select(m => m.Name)
+                            .Where(name => !string.IsNullOrEmpty(name))
+                            .ToList();
+                        
+                        if (models?.Any() == true)
+                        {
+                            return models;
+                        }
+                        return new[] { "llama2", "codellama", "mistral" };
+                    }
                 }
+
+                return new[] { "llama2", "codellama", "mistral" };
             }
             catch (Exception ex)
             {
@@ -1122,18 +1175,34 @@ namespace AiderVSExtension.Services
         public async Task<ConnectionTestResult> TestConnectionAsync(AIModelConfiguration configuration)
         {
             var startTime = DateTime.UtcNow;
-            var isSuccessful = await TestConnectionAsync(configuration).ConfigureAwait(false);
+            bool isSuccessful = false;
+            
+            switch (configuration?.Provider)
+            {
+                case AIProvider.ChatGPT:
+                    isSuccessful = await TestOpenAIConnectionAsync(configuration);
+                    break;
+                case AIProvider.Claude:
+                    isSuccessful = await TestClaudeConnectionAsync(configuration);
+                    break;
+                case AIProvider.Ollama:
+                    isSuccessful = await TestOllamaConnectionAsync(configuration);
+                    break;
+                default:
+                    isSuccessful = false;
+                    break;
+            }
+            
             var responseTime = DateTime.UtcNow - startTime;
 
             return new ConnectionTestResult
             {
-                IsSuccessful = isSuccessful.IsSuccessful,
+                IsSuccessful = isSuccessful,
                 ResponseTime = responseTime,
-                ErrorMessage = isSuccessful.ErrorMessage,
+                ErrorMessage = isSuccessful ? null : "Connection test failed",
                 ModelVersion = configuration?.ModelName
             };
         }
-
 
         #region IDisposable Implementation
 
@@ -1168,108 +1237,114 @@ namespace AiderVSExtension.Services
         #endregion
     }
 
+    // OpenAI API response models
+    public class OpenAIResponse
+    {
+        [JsonProperty("choices")]
+        public List<OpenAIChoice> Choices { get; set; }
+
+        [JsonProperty("usage")]
+        public OpenAIUsage Usage { get; set; }
+
+        [JsonProperty("model")]
+        public string Model { get; set; }
+    }
+
+    public class OpenAIChoice
+    {
+        [JsonProperty("message")]
+        public OpenAIMessage Message { get; set; }
+
+        [JsonProperty("finish_reason")]
+        public string FinishReason { get; set; }
+    }
+
+    public class OpenAIMessage
+    {
+        [JsonProperty("content")]
+        public string Content { get; set; }
+
+        [JsonProperty("role")]
+        public string Role { get; set; }
+    }
+
+    public class OpenAIUsage
+    {
+        [JsonProperty("total_tokens")]
+        public int TotalTokens { get; set; }
+    }
+
+    public class OpenAIModelsResponse
+    {
+        [JsonProperty("data")]
+        public List<OpenAIModel> Data { get; set; }
+    }
+
+    public class OpenAIModel
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+    }
+
     // Claude API response models
     public class ClaudeResponse
     {
-        [JsonPropertyName("content")]
+        [JsonProperty("content")]
         public List<ClaudeContent> Content { get; set; }
 
-        [JsonPropertyName("usage")]
+        [JsonProperty("usage")]
         public ClaudeUsage Usage { get; set; }
 
-        [JsonPropertyName("model")]
+        [JsonProperty("model")]
         public string Model { get; set; }
     }
 
     public class ClaudeContent
     {
-        [JsonPropertyName("text")]
+        [JsonProperty("text")]
         public string Text { get; set; }
 
-        [JsonPropertyName("type")]
+        [JsonProperty("type")]
         public string Type { get; set; }
     }
 
     public class ClaudeUsage
     {
-        [JsonPropertyName("input_tokens")]
+        [JsonProperty("input_tokens")]
         public int InputTokens { get; set; }
 
-        [JsonPropertyName("output_tokens")]
+        [JsonProperty("output_tokens")]
         public int OutputTokens { get; set; }
     }
 
     // Ollama API response models
     public class OllamaResponse
     {
-        [JsonPropertyName("response")]
+        [JsonProperty("response")]
         public string Response { get; set; }
 
-        [JsonPropertyName("model")]
+        [JsonProperty("model")]
         public string Model { get; set; }
 
-        [JsonPropertyName("done")]
+        [JsonProperty("done")]
         public bool Done { get; set; }
     }
 
     public class OllamaTagsResponse
     {
-        [JsonPropertyName("models")]
+        [JsonProperty("models")]
         public List<OllamaModel> Models { get; set; }
     }
 
     public class OllamaModel
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("modified_at")]
+        [JsonProperty("modified_at")]
         public DateTime ModifiedAt { get; set; }
 
-        [JsonPropertyName("size")]
+        [JsonProperty("size")]
         public long Size { get; set; }
-    }
-
-    // OpenAI API response models
-    public class OpenAIResponse
-    {
-        [JsonPropertyName("choices")]
-        public List<OpenAIChoice> Choices { get; set; }
-
-        [JsonPropertyName("usage")]
-        public OpenAIUsage Usage { get; set; }
-
-        [JsonPropertyName("model")]
-        public string Model { get; set; }
-    }
-
-    public class OpenAIChoice
-    {
-        [JsonPropertyName("message")]
-        public OpenAIMessage Message { get; set; }
-
-        [JsonPropertyName("finish_reason")]
-        public string FinishReason { get; set; }
-    }
-
-    public class OpenAIMessage
-    {
-        [JsonPropertyName("content")]
-        public string Content { get; set; }
-
-        [JsonPropertyName("role")]
-        public string Role { get; set; }
-    }
-
-    public class OpenAIUsage
-    {
-        [JsonPropertyName("total_tokens")]
-        public int TotalTokens { get; set; }
-
-        [JsonPropertyName("prompt_tokens")]
-        public int PromptTokens { get; set; }
-
-        [JsonPropertyName("completion_tokens")]
-        public int CompletionTokens { get; set; }
     }
 }

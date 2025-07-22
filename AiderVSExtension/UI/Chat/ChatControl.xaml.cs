@@ -268,7 +268,7 @@ namespace AiderVSExtension.UI.Chat
         {
             if (IsProcessing || !_isInitialized) return;
             
-            var messageText = InputTextBox.Text?.Trim();
+            var messageText = InputTextBox.Text == null ? string.Empty : InputTextBox.Text.Trim();
             if (string.IsNullOrEmpty(messageText)) return;
             
             try
@@ -535,11 +535,14 @@ namespace AiderVSExtension.UI.Chat
 
         #region Context Menu
 
+        // Manually declare the ContextMenuControl field since XAML generation has issues
+        private ContextMenuControl ContextMenuControlInstance;
+
         private void ShowContextMenu()
         {
-            if (ContextMenuControl != null)
+            if (ContextMenuControlInstance != null)
             {
-                ContextMenuControl.LoadContextItems();
+                ContextMenuControlInstance.LoadContextItems();
                 ContextMenuPopup.IsOpen = true;
             }
         }
@@ -655,12 +658,12 @@ namespace AiderVSExtension.UI.Chat
             try
             {
                 // Create a simple web search dialog
-                var searchTerm = Microsoft.VisualStudio.PlatformUI.MessageDialog.Show(
-                    "Web Search", 
+                var result = MessageBox.Show(
                     "Enter search terms:", 
-                    Microsoft.VisualStudio.PlatformUI.MessageBoxButton.OKCancel);
+                    "Web Search", 
+                    MessageBoxButton.OKCancel);
                     
-                if (searchTerm == Microsoft.VisualStudio.PlatformUI.MessageBoxResult.OK)
+                if (result == MessageBoxResult.OK)
                 {
                     var searchText = "web search";
                     
@@ -690,7 +693,7 @@ namespace AiderVSExtension.UI.Chat
             {
                 // Get current project context
                 var dte = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-                if (dte?.Solution != null)
+                if (dte != null && dte.Solution != null)
                 {
                     var projectName = System.IO.Path.GetFileNameWithoutExtension(dte.Solution.FullName);
                     
@@ -739,7 +742,7 @@ namespace AiderVSExtension.UI.Chat
                 return new List<ChatMessage>();
             
             return _messages.Where(m => 
-                m.Content.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                m.Content.Contains(searchText))
                 .ToList();
         }
 
@@ -756,7 +759,7 @@ namespace AiderVSExtension.UI.Chat
                     // Scroll to the message
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        if (MessagesPanel.ItemContainerGenerator.ContainerFromIndex(messageIndex) is FrameworkElement container)
+                        if (MessagesPanel.ItemContainerGenerator.ContainerFromIndex(messageIndex) is Control container)
                         {
                             container.BringIntoView();
                             
@@ -791,7 +794,7 @@ namespace AiderVSExtension.UI.Chat
                 // Clear all highlights from message containers
                 for (int i = 0; i < _messages.Count; i++)
                 {
-                    if (MessagesPanel.ItemContainerGenerator.ContainerFromIndex(i) is FrameworkElement container)
+                    if (MessagesPanel.ItemContainerGenerator.ContainerFromIndex(i) is Control container)
                     {
                         container.Background = Brushes.Transparent;
                     }
@@ -817,7 +820,7 @@ namespace AiderVSExtension.UI.Chat
 
         private void UpdateStatus(string message = null)
         {
-            var statusMessage = message ?? (IsProcessing ? "Processing..." : (!_isInitialized ? "Initializing..." : "Ready"));
+            var statusMessage = message == null ? (IsProcessing ? "Processing..." : (!_isInitialized ? "Initializing..." : "Ready")) : message;
             
             // Update StatusTextBlock if it exists
             if (StatusTextBlock != null)
@@ -901,11 +904,11 @@ namespace AiderVSExtension.UI.Chat
                 // Ensure UI update happens on UI thread
                 Dispatcher.Invoke(() =>
                 {
-                    if (ChatInput != null)
+                    if (InputTextBox != null)
                     {
-                        ChatInput.Text = text;
-                        ChatInput.Focus();
-                        ChatInput.SelectionStart = ChatInput.Text.Length;
+                        InputTextBox.Text = text;
+                        InputTextBox.Focus();
+                        InputTextBox.SelectionStart = InputTextBox.Text.Length;
                     }
                 });
             }
@@ -985,18 +988,18 @@ namespace AiderVSExtension.UI.Chat
                 if (_themingService == null) return;
 
                 // Update highlight colors for search functionality
-                var highlightColor = _themingService.GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.SearchHighlightBackground);
-                if (highlightColor.HasValue)
+                var highlightColor = _themingService.GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Highlight);
+                if (highlightColor != null)
                 {
                     // Store the theme color for use in search highlighting
-                    Resources["SearchHighlightBrush"] = new SolidColorBrush(highlightColor.Value);
+                    Resources["SearchHighlightBrush"] = new SolidColorBrush(highlightColor);
                 }
 
                 // Update text selection colors
-                var selectionColor = _themingService.GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.TextSelectionBackground);
-                if (selectionColor.HasValue)
+                var selectionColor = _themingService.GetThemedColor(AiderVSExtension.Interfaces.ThemeResourceKey.Selection);
+                if (selectionColor != null)
                 {
-                    Resources["TextSelectionBrush"] = new SolidColorBrush(selectionColor.Value);
+                    Resources["TextSelectionBrush"] = new SolidColorBrush(selectionColor);
                 }
 
                 // Force refresh of all UI elements that use theme resources
@@ -1016,7 +1019,8 @@ namespace AiderVSExtension.UI.Chat
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (PropertyChanged != null)
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion
@@ -1031,11 +1035,16 @@ namespace AiderVSExtension.UI.Chat
                 _themingService.ThemeChanged -= OnThemeChanged;
             }
             
-            _typingTimer?.Stop();
-            _typingTimer = null;
+            if (_typingTimer != null)
+            {
+                _typingTimer.Stop();
+                _typingTimer = null;
+            }
             
-            _messages?.Clear();
-            _fileReferences?.Clear();
+            if (_messages != null)
+                _messages.Clear();
+            if (_fileReferences != null)
+                _fileReferences.Clear();
         }
 
         #endregion

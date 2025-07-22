@@ -50,8 +50,8 @@ namespace AiderVSExtension.Services
 
         public AdvancedConfigurationService(IConfigurationService baseConfigurationService, IErrorHandler errorHandler)
         {
-            _baseConfigurationService = baseConfigurationService ?? throw new ArgumentNullException(nameof(baseConfigurationService));
-            _errorHandler = errorHandler ?? throw new ArgumentNullException(nameof(errorHandler));
+            _baseConfigurationService = baseConfigurationService == null ? throw new ArgumentNullException(nameof(baseConfigurationService)) : baseConfigurationService;
+            _errorHandler = errorHandler == null ? throw new ArgumentNullException(nameof(errorHandler)) : errorHandler;
 
             // Initialize settings store
             var serviceProvider = ServiceProvider.GlobalProvider;
@@ -75,14 +75,14 @@ namespace AiderVSExtension.Services
         /// </summary>
         public async Task<IEnumerable<ConfigurationProfile>> GetProfilesAsync()
         {
-            return await Task.FromResult(() =>
+            return await Task.Run(() =>
             {
                 lock (_lockObject)
                 {
                     RefreshProfilesCache();
                     return _profilesCache.Values.ToList();
                 }
-            }()).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -90,14 +90,15 @@ namespace AiderVSExtension.Services
         /// </summary>
         public async Task<ConfigurationProfile> GetProfileAsync(string profileId)
         {
-            return await Task.FromResult(() =>
+            return await Task.Run(() =>
             {
                 lock (_lockObject)
                 {
                     RefreshProfilesCache();
-                    return _profilesCache.TryGetValue(profileId, out var profile) ? profile : null;
+                    ConfigurationProfile profile;
+                    return _profilesCache.TryGetValue(profileId, out profile) ? profile : null;
                 }
-            }()).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace AiderVSExtension.Services
                 // Validate profile
                 var validationResult = await ValidateProfileAsync(profile).ConfigureAwait(false);
                 if (!validationResult.IsValid)
-                    throw new InvalidOperationException($"Profile validation failed: {string.Join(", ", validationResult.Errors)}");
+                    throw new InvalidOperationException($"Profile validation failed: {string.Join(", ", validationResult.ValidationErrors)}");
 
                 // Create backup if enabled
                 if (_autoBackupEnabled)
@@ -159,7 +160,7 @@ namespace AiderVSExtension.Services
                 // Validate profile
                 var validationResult = await ValidateProfileAsync(profile).ConfigureAwait(false);
                 if (!validationResult.IsValid)
-                    throw new InvalidOperationException($"Profile validation failed: {string.Join(", ", validationResult.Errors)}");
+                    throw new InvalidOperationException($"Profile validation failed: {string.Join(", ", validationResult.ValidationErrors)}");
 
                 // Create backup if enabled
                 if (_autoBackupEnabled)
@@ -237,7 +238,7 @@ namespace AiderVSExtension.Services
                     throw new InvalidOperationException($"Profile with ID '{profileId}' not found");
 
                 var oldActiveProfile = await GetActiveProfileAsync().ConfigureAwait(false);
-                var oldProfileId = oldActiveProfile?.Id;
+                var oldProfileId = oldActiveProfile == null ? null : oldActiveProfile.Id;
 
                 // Deactivate current profile
                 if (oldActiveProfile != null)
@@ -256,7 +257,8 @@ namespace AiderVSExtension.Services
                 await ApplyProfileConfigurationAsync(profile).ConfigureAwait(false);
 
                 // Fire event
-                ProfileChanged?.Invoke(this, new ConfigurationProfileChangedEventArgs
+                if (ProfileChanged != null)
+                    ProfileChanged.Invoke(this, new ConfigurationProfileChangedEventArgs
                 {
                     OldProfileId = oldProfileId,
                     NewProfileId = profileId
@@ -276,14 +278,14 @@ namespace AiderVSExtension.Services
         /// </summary>
         public async Task<ConfigurationProfile> GetActiveProfileAsync()
         {
-            return await Task.FromResult(() =>
+            return await Task.Run(() =>
             {
                 lock (_lockObject)
                 {
                     RefreshProfilesCache();
                     return _profilesCache.Values.FirstOrDefault(p => p.IsActive);
                 }
-            }()).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -319,14 +321,14 @@ namespace AiderVSExtension.Services
         /// </summary>
         public async Task<IEnumerable<ConfigurationTemplate>> GetTemplatesAsync()
         {
-            return await Task.FromResult(() =>
+            return await Task.Run(() =>
             {
                 lock (_lockObject)
                 {
                     RefreshTemplatesCache();
                     return _templatesCache.Values.ToList();
                 }
-            }()).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -334,14 +336,15 @@ namespace AiderVSExtension.Services
         /// </summary>
         public async Task<ConfigurationTemplate> GetTemplateAsync(string templateId)
         {
-            return await Task.FromResult(() =>
+            return await Task.Run(() =>
             {
                 lock (_lockObject)
                 {
                     RefreshTemplatesCache();
-                    return _templatesCache.TryGetValue(templateId, out var template) ? template : null;
+                    ConfigurationTemplate template;
+                    return _templatesCache.TryGetValue(templateId, out template) ? template : null;
                 }
-            }()).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -539,7 +542,7 @@ namespace AiderVSExtension.Services
         public async Task<AIModelAdvancedParameters> GetAdvancedParametersAsync(AIProvider provider)
         {
             var activeProfile = await GetActiveProfileAsync().ConfigureAwait(false);
-            if (activeProfile?.AdvancedParameters?.ContainsKey(provider) == true)
+            if (activeProfile != null && activeProfile.AdvancedParameters != null && activeProfile.AdvancedParameters.ContainsKey(provider))
             {
                 return activeProfile.AdvancedParameters[provider];
             }
@@ -727,7 +730,8 @@ namespace AiderVSExtension.Services
                     // Cleanup old backups
                     await CleanupOldBackupsAsync();
 
-                    ConfigurationBackedUp?.Invoke(this, new ConfigurationBackupEventArgs
+                    if (ConfigurationBackedUp != null)
+                        ConfigurationBackedUp.Invoke(this, new ConfigurationBackupEventArgs
                     {
                         BackupId = backup.Id,
                         BackupName = backup.Name,
@@ -797,14 +801,15 @@ namespace AiderVSExtension.Services
                     // Restore templates
                     if (configData.Templates != null)
                     {
-                        var templates = JsonConvert.DeserializeObject<List<ConfigurationTemplate>>(configData.Templates.ToString());
+                        var templates = SecureJsonSerializer.Deserialize<List<ConfigurationTemplate>>(configData.Templates.ToString(), strict: true);
                         foreach (var template in templates)
                         {
                             await CreateTemplateAsync(template);
                         }
                     }
 
-                    ConfigurationRestored?.Invoke(this, new ConfigurationRestoreEventArgs
+                    if (ConfigurationRestored != null)
+                        ConfigurationRestored.Invoke(this, new ConfigurationRestoreEventArgs
                     {
                         BackupId = backupId,
                         BackupName = backup.Name,
@@ -815,7 +820,8 @@ namespace AiderVSExtension.Services
                 }
                 catch (Exception ex)
                 {
-                    ConfigurationRestored?.Invoke(this, new ConfigurationRestoreEventArgs
+                    if (ConfigurationRestored != null)
+                        ConfigurationRestored.Invoke(this, new ConfigurationRestoreEventArgs
                     {
                         BackupId = backupId,
                         IsSuccessful = false,
@@ -871,7 +877,7 @@ namespace AiderVSExtension.Services
                 {
                     _autoBackupEnabled = enabled;
                     await SetValueAsync("AutoBackupEnabled", enabled);
-                    await _errorHandler.LogInfoAsync($"Auto-backup {(enabled ? "enabled" : "disabled")}", "AdvancedConfigurationService.SetAutoBackupAsync");
+                    await _errorHandler.LogInfoAsync("Auto-backup " + (enabled ? "enabled" : "disabled"), "AdvancedConfigurationService.SetAutoBackupAsync");
                 }
                 catch (Exception ex)
                 {
@@ -922,7 +928,7 @@ namespace AiderVSExtension.Services
                         throw new InvalidOperationException($"Profile with ID '{profileId}' not found");
 
                     string content = SerializeProfile(profile, format);
-                    await File.WriteAllTextAsync(filePath, content);
+                    File.WriteAllText(filePath, content);
 
                     await _errorHandler.LogInfoAsync($"Exported profile '{profile.Name}' to '{filePath}'", "AdvancedConfigurationService.ExportProfileAsync");
                 }
@@ -943,7 +949,7 @@ namespace AiderVSExtension.Services
             {
                 try
                 {
-                    var content = await File.ReadAllTextAsync(filePath);
+                    var content = File.ReadAllText(filePath);
                     var profile = DeserializeProfile(content, format);
                     
                     // Generate new ID and update metadata
@@ -980,7 +986,7 @@ namespace AiderVSExtension.Services
                         throw new InvalidOperationException($"Template with ID '{templateId}' not found");
 
                     string content = SerializeTemplate(template, format);
-                    await File.WriteAllTextAsync(filePath, content);
+                    File.WriteAllText(filePath, content);
 
                     await _errorHandler.LogInfoAsync($"Exported template '{template.Name}' to '{filePath}'", "AdvancedConfigurationService.ExportTemplateAsync");
                 }
@@ -1001,7 +1007,7 @@ namespace AiderVSExtension.Services
             {
                 try
                 {
-                    var content = await File.ReadAllTextAsync(filePath);
+                    var content = File.ReadAllText(filePath);
                     var template = DeserializeTemplate(content, format);
                     
                     // Generate new ID and update metadata
@@ -1039,26 +1045,26 @@ namespace AiderVSExtension.Services
                 if (profile == null)
                 {
                     result.IsValid = false;
-                    result.Errors.Add("Profile cannot be null");
+                    result.ValidationErrors.Add(new ValidationError { ErrorMessage = "Profile cannot be null" });
                     return result;
                 }
 
                 if (string.IsNullOrWhiteSpace(profile.Name))
                 {
                     result.IsValid = false;
-                    result.Errors.Add("Profile name is required");
+                    result.ValidationErrors.Add(new ValidationError { ErrorMessage = "Profile name is required" });
                 }
 
-                if (profile.Name?.Length > 100)
+                if (profile.Name != null && profile.Name.Length > 100)
                 {
                     result.IsValid = false;
-                    result.Errors.Add("Profile name cannot exceed 100 characters");
+                    result.ValidationErrors.Add(new ValidationError { ErrorMessage = "Profile name cannot exceed 100 characters" });
                 }
 
                 // Validate AI model configuration
                 if (profile.AIModelConfiguration == null)
                 {
-                    result.Warnings.Add("AI model configuration is not set");
+                    result.ValidationErrors.Add(new ValidationError { ErrorMessage = "AI model configuration is not set" });
                 }
 
                 return result;
@@ -1397,7 +1403,8 @@ namespace AiderVSExtension.Services
             }
             catch (Exception ex)
             {
-                _errorHandler?.HandleExceptionAsync(ex, "AdvancedConfigurationService.InitializeCollections");
+                if (_errorHandler != null)
+                    _ = _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.InitializeCollections");
             }
         }
 
@@ -1412,7 +1419,8 @@ namespace AiderVSExtension.Services
             }
             catch (Exception ex)
             {
-                _errorHandler?.HandleExceptionAsync(ex, "AdvancedConfigurationService.LoadCachedData");
+                if (_errorHandler != null)
+                    _ = _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.LoadCachedData");
             }
         }
 
@@ -1429,13 +1437,14 @@ namespace AiderVSExtension.Services
                 foreach (var propertyName in propertiesToLoad)
                 {
                     var json = _settingsStore.GetString(_profilesCollectionPath, propertyName);
-                    var profile = JsonConvert.DeserializeObject<ConfigurationProfile>(json);
+                    var profile = SecureJsonSerializer.Deserialize<ConfigurationProfile>(json, strict: true);
                     _profilesCache[profile.Id] = profile;
                 }
             }
             catch (Exception ex)
             {
-                _errorHandler?.HandleExceptionAsync(ex, "AdvancedConfigurationService.RefreshProfilesCache");
+                if (_errorHandler != null)
+                    _ = _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.RefreshProfilesCache");
             }
         }
 
@@ -1452,13 +1461,14 @@ namespace AiderVSExtension.Services
                 foreach (var propertyName in propertiesToLoad)
                 {
                     var json = _settingsStore.GetString(_templatesCollectionPath, propertyName);
-                    var template = JsonConvert.DeserializeObject<ConfigurationTemplate>(json);
+                    var template = SecureJsonSerializer.Deserialize<ConfigurationTemplate>(json, strict: true);
                     _templatesCache[template.Id] = template;
                 }
             }
             catch (Exception ex)
             {
-                _errorHandler?.HandleExceptionAsync(ex, "AdvancedConfigurationService.RefreshTemplatesCache");
+                if (_errorHandler != null)
+                    _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.RefreshTemplatesCache");
             }
         }
 
@@ -1475,13 +1485,14 @@ namespace AiderVSExtension.Services
                 foreach (var propertyName in propertiesToLoad)
                 {
                     var json = _settingsStore.GetString(_backupsCollectionPath, propertyName);
-                    var backup = JsonConvert.DeserializeObject<ConfigurationBackup>(json);
+                    var backup = SecureJsonSerializer.Deserialize<ConfigurationBackup>(json, strict: true);
                     _backupsCache[backup.Id] = backup;
                 }
             }
             catch (Exception ex)
             {
-                _errorHandler?.HandleExceptionAsync(ex, "AdvancedConfigurationService.RefreshBackupsCache");
+                if (_errorHandler != null)
+                    _ = _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.RefreshBackupsCache");
             }
         }
 
@@ -1495,7 +1506,8 @@ namespace AiderVSExtension.Services
             }
             catch (Exception ex)
             {
-                _errorHandler?.HandleExceptionAsync(ex, "AdvancedConfigurationService.LoadSettings");
+                if (_errorHandler != null)
+                    _ = _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.LoadSettings");
             }
         }
 
@@ -1506,7 +1518,8 @@ namespace AiderVSExtension.Services
                 lock (_lockObject)
                 {
                     RefreshBackupsCache();
-                    return _backupsCache.TryGetValue(backupId, out var backup) ? backup : null;
+                    ConfigurationBackup backup;
+                    return _backupsCache.TryGetValue(backupId, out backup) ? backup : null;
                 }
             });
         }
@@ -1533,7 +1546,7 @@ namespace AiderVSExtension.Services
                 }
                 catch (Exception ex)
                 {
-                    await _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.CleanupOldBackupsAsync");
+                    _ = await _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.CleanupOldBackupsAsync");
                 }
             });
         }
@@ -1568,7 +1581,7 @@ namespace AiderVSExtension.Services
                 }
                 catch (Exception ex)
                 {
-                    await _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.ApplyProfileConfigurationAsync");
+                    _ = await _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.ApplyProfileConfigurationAsync");
                 }
             });
         }
@@ -1595,13 +1608,13 @@ namespace AiderVSExtension.Services
             switch (format)
             {
                 case ConfigurationExportFormat.Json:
-                    return JsonConvert.DeserializeObject<ConfigurationProfile>(content);
+                    return SecureJsonSerializer.Deserialize<ConfigurationProfile>(content, strict: true);
                 case ConfigurationExportFormat.Xml:
                     // XML deserialization not yet implemented - try JSON fallback
-                    return JsonConvert.DeserializeObject<ConfigurationProfile>(content);
+                    return SecureJsonSerializer.Deserialize<ConfigurationProfile>(content, strict: true);
                 case ConfigurationExportFormat.Yaml:
                     // YAML deserialization not yet implemented - try JSON fallback
-                    return JsonConvert.DeserializeObject<ConfigurationProfile>(content);
+                    return SecureJsonSerializer.Deserialize<ConfigurationProfile>(content, strict: true);
                 default:
                     throw new ArgumentException($"Unsupported import format: {format}");
             }
@@ -1629,13 +1642,13 @@ namespace AiderVSExtension.Services
             switch (format)
             {
                 case ConfigurationExportFormat.Json:
-                    return JsonConvert.DeserializeObject<ConfigurationTemplate>(content);
+                    return SecureJsonSerializer.Deserialize<ConfigurationTemplate>(content, strict: true);
                 case ConfigurationExportFormat.Xml:
                     // XML deserialization not yet implemented - try JSON fallback
-                    return JsonConvert.DeserializeObject<ConfigurationTemplate>(content);
+                    return SecureJsonSerializer.Deserialize<ConfigurationTemplate>(content, strict: true);
                 case ConfigurationExportFormat.Yaml:
                     // YAML deserialization not yet implemented - try JSON fallback
-                    return JsonConvert.DeserializeObject<ConfigurationTemplate>(content);
+                    return SecureJsonSerializer.Deserialize<ConfigurationTemplate>(content, strict: true);
                 default:
                     throw new ArgumentException($"Unsupported import format: {format}");
             }
@@ -1652,11 +1665,12 @@ namespace AiderVSExtension.Services
                 }
 
                 // Forward the event
-                ConfigurationChanged?.Invoke(sender, e);
+                if (ConfigurationChanged != null)
+                    ConfigurationChanged.Invoke(sender, e);
             }
             catch (Exception ex)
             {
-                await _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.OnBaseConfigurationChanged");
+                _ = await _errorHandler.HandleExceptionAsync(ex, "AdvancedConfigurationService.OnBaseConfigurationChanged");
             }
         }
 
@@ -1709,8 +1723,8 @@ namespace AiderVSExtension.Services
         /// </summary>
         public bool IsAICompletionEnabled
         {
-            get => _baseConfigurationService.GetValue(Constants.ConfigurationKeys.AICompletionEnabled, Constants.DefaultValues.DefaultAICompletionEnabled);
-            set => _baseConfigurationService.SetValue(Constants.ConfigurationKeys.AICompletionEnabled, value);
+            get => _baseConfigurationService.GetValue(Models.Constants.ConfigurationKeys.AICompletionEnabled, Models.Constants.DefaultValues.DefaultAICompletionEnabled);
+            set => _baseConfigurationService.SetValueAsync(Models.Constants.ConfigurationKeys.AICompletionEnabled, value);
         }
 
         /// <summary>
@@ -1722,9 +1736,10 @@ namespace AiderVSExtension.Services
             IsAICompletionEnabled = !current;
             
             // Fire configuration changed event
-            ConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs
+            if (ConfigurationChanged != null)
+                ConfigurationChanged.Invoke(this, new ConfigurationChangedEventArgs
             {
-                Key = Constants.ConfigurationKeys.AICompletionEnabled,
+                Key = Models.Constants.ConfigurationKeys.AICompletionEnabled,
                 OldValue = current,
                 NewValue = IsAICompletionEnabled
             });

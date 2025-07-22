@@ -485,6 +485,16 @@ namespace AiderVSExtension.Models
         /// Additional information
         /// </summary>
         public Dictionary<string, object> AdditionalInfo { get; set; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// The recommendation type
+        /// </summary>
+        public RecommendationType Type { get; set; }
+
+        /// <summary>
+        /// Recommended actions to take
+        /// </summary>
+        public List<string> Actions { get; set; } = new List<string>();
     }
 
     /// <summary>
@@ -760,6 +770,16 @@ namespace AiderVSExtension.Models
         public string SettingKey { get; set; }
         public string Resolution { get; set; }
         public Dictionary<string, object> Details { get; set; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Issue category
+        /// </summary>
+        public string Category { get; set; }
+
+        /// <summary>
+        /// Issue impact description
+        /// </summary>
+        public string Impact { get; set; }
     }
 
     /// <summary>
@@ -907,6 +927,18 @@ namespace AiderVSExtension.Models
         Medium,
         High,
         Critical
+    }
+
+    /// <summary>
+    /// Recommendation type
+    /// </summary>
+    public enum RecommendationType
+    {
+        Usage,
+        Performance,
+        Configuration,
+        Update,
+        Security
     }
 
     /// <summary>

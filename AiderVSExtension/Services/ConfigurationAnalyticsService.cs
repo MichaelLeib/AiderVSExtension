@@ -250,7 +250,7 @@ namespace AiderVSExtension.Services
                         {
                             new HealthIssue
                             {
-                                Severity = IssueSeverity.Critical,
+                                Severity = HealthIssueSeverity.Critical,
                                 Category = "Profile",
                                 Description = "Profile not found",
                                 Impact = "Configuration cannot be used"
@@ -426,7 +426,7 @@ namespace AiderVSExtension.Services
             {
                 issues.Add(new HealthIssue
                 {
-                    Severity = IssueSeverity.Warning,
+                    Severity = HealthIssueSeverity.Warning,
                     Category = "Configuration",
                     Description = "Profile name is empty",
                     Impact = "Profile may be difficult to identify"
@@ -443,7 +443,7 @@ namespace AiderVSExtension.Services
             {
                 issues.Add(new HealthIssue
                 {
-                    Severity = IssueSeverity.Critical,
+                    Severity = HealthIssueSeverity.Critical,
                     Category = "AI Model",
                     Description = "No AI model configured",
                     Impact = "AI features will not work"
@@ -457,7 +457,7 @@ namespace AiderVSExtension.Services
                 {
                     issues.Add(new HealthIssue
                     {
-                        Severity = IssueSeverity.Critical,
+                        Severity = HealthIssueSeverity.Critical,
                         Category = "AI Model",
                         Description = "API key is missing",
                         Impact = "AI model cannot be accessed"
@@ -473,7 +473,7 @@ namespace AiderVSExtension.Services
                 {
                     issues.Add(new HealthIssue
                     {
-                        Severity = IssueSeverity.Error,
+                        Severity = HealthIssueSeverity.Error,
                         Category = "AI Model",
                         Description = "Model name is missing",
                         Impact = "Default model will be used"
@@ -498,7 +498,7 @@ namespace AiderVSExtension.Services
                 {
                     issues.Add(new HealthIssue
                     {
-                        Severity = IssueSeverity.Warning,
+                        Severity = HealthIssueSeverity.Warning,
                         Category = "Performance",
                         Description = $"Low success rate: {successRate:P1}",
                         Impact = "Operations may be failing frequently"
@@ -515,7 +515,7 @@ namespace AiderVSExtension.Services
                 {
                     issues.Add(new HealthIssue
                     {
-                        Severity = IssueSeverity.Warning,
+                        Severity = HealthIssueSeverity.Warning,
                         Category = "Performance",
                         Description = $"Slow average response time: {avgDuration:F0}ms",
                         Impact = "Operations may be taking too long"
@@ -529,14 +529,18 @@ namespace AiderVSExtension.Services
             }
 
             var overallScore = scores.Any() ? (int)scores.Average() : 50;
-            var overallHealth = overallScore switch
-            {
-                >= 90 => HealthLevel.Excellent,
-                >= 80 => HealthLevel.Good,
-                >= 60 => HealthLevel.Fair,
-                >= 40 => HealthLevel.Poor,
-                _ => HealthLevel.Critical
-            };
+            HealthLevel overallHealth;
+            
+            if (overallScore >= 90)
+                overallHealth = HealthLevel.Excellent;
+            else if (overallScore >= 80)
+                overallHealth = HealthLevel.Good;
+            else if (overallScore >= 60)
+                overallHealth = HealthLevel.Fair;
+            else if (overallScore >= 40)
+                overallHealth = HealthLevel.Poor;
+            else
+                overallHealth = HealthLevel.Critical;
 
             return new ConfigurationHealthStatus
             {
@@ -570,7 +574,7 @@ namespace AiderVSExtension.Services
                     Title = "Low Usage Detected",
                     Description = "This profile has been used very little. Consider exploring more features or removing if not needed.",
                     ExpectedImpact = "Better organization and performance",
-                    Category = "Usage",
+                    Category = RecommendationCategory.Usability,
                     Actions = new List<string> { "Explore features", "Remove unused profile" }
                 });
             }
@@ -585,7 +589,7 @@ namespace AiderVSExtension.Services
                     Title = "High Error Rate",
                     Description = "This profile has a high error rate. Check configuration settings.",
                     ExpectedImpact = "Reduced errors and better reliability",
-                    Category = "Reliability",
+                    Category = RecommendationCategory.Reliability,
                     Actions = new List<string> { "Check API key", "Verify model settings", "Test configuration" }
                 });
             }
@@ -607,7 +611,7 @@ namespace AiderVSExtension.Services
                     Title = "Low Success Rate",
                     Description = $"Success rate is {analytics.SuccessRate:F1}%. Consider reviewing configuration.",
                     ExpectedImpact = "Higher success rate and reliability",
-                    Category = "Performance",
+                    Category = RecommendationCategory.Performance,
                     Actions = new List<string> { "Check network connectivity", "Verify API credentials", "Review timeout settings" }
                 });
             }
@@ -622,7 +626,7 @@ namespace AiderVSExtension.Services
                     Title = "Slow Response Times",
                     Description = $"Average response time is {analytics.AverageDuration.TotalSeconds:F1} seconds.",
                     ExpectedImpact = "Faster response times",
-                    Category = "Performance",
+                    Category = RecommendationCategory.Performance,
                     Actions = new List<string> { "Reduce max tokens", "Use faster model", "Check network latency" }
                 });
             }
@@ -645,7 +649,7 @@ namespace AiderVSExtension.Services
                     Title = "Consider Advanced Parameters",
                     Description = "Advanced parameters are not configured. These can improve AI responses.",
                     ExpectedImpact = "Better AI response quality",
-                    Category = "Configuration",
+                    Category = RecommendationCategory.Maintainability,
                     Actions = new List<string> { "Configure temperature", "Set max tokens", "Adjust creativity settings" }
                 });
             }
@@ -661,7 +665,7 @@ namespace AiderVSExtension.Services
                     Title = "Update Configuration",
                     Description = "This profile may be using an older configuration format.",
                     ExpectedImpact = "Access to new features and improvements",
-                    Category = "Maintenance",
+                    Category = RecommendationCategory.Maintainability,
                     Actions = new List<string> { "Run migration wizard", "Update to latest version" }
                 });
             }

@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Forms.Integration;
 using Microsoft.VisualStudio.Shell;
 using AiderVSExtension.UI;
 using AiderVSExtension.Services;
@@ -22,7 +24,7 @@ namespace AiderVSExtension.Options
         /// <summary>
         /// Gets the WPF control for the options page
         /// </summary>
-        protected override UIElement Child
+        protected override System.Windows.Forms.IWin32Window Window
         {
             get
             {
@@ -30,7 +32,11 @@ namespace AiderVSExtension.Options
                 {
                     InitializeConfigurationPage();
                 }
-                return _configurationPage;
+                var elementHost = new ElementHost { Child = _configurationPage };
+                var userControl = new UserControl();
+                userControl.Controls.Add(elementHost);
+                elementHost.Dock = DockStyle.Fill;
+                return userControl;
             }
         }
         

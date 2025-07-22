@@ -8,6 +8,7 @@ using System.Timers;
 using AiderVSExtension.Interfaces;
 using AiderVSExtension.Models;
 using Microsoft.VisualStudio.Shell;
+using FileInfo = System.IO.FileInfo;
 
 namespace AiderVSExtension.Services
 {
@@ -53,9 +54,10 @@ namespace AiderVSExtension.Services
             _cacheAccessTimes = new Dictionary<string, DateTime>();
             
             // Initialize cache cleanup timer
-            _cacheCleanupTimer = new Timer(CleanupCache, null, 
-                TimeSpan.FromMinutes(CACHE_CLEANUP_INTERVAL_MINUTES),
-                TimeSpan.FromMinutes(CACHE_CLEANUP_INTERVAL_MINUTES));
+            _cacheCleanupTimer = new Timer();
+            _cacheCleanupTimer.Elapsed += (sender, e) => CleanupCache(null);
+            _cacheCleanupTimer.Interval = TimeSpan.FromMinutes(CACHE_CLEANUP_INTERVAL_MINUTES).TotalMilliseconds;
+            _cacheCleanupTimer.AutoReset = true;
             
             // NOTE: Directory creation and cache initialization moved to InitializeAsync()
             // to avoid blocking the UI thread during service construction

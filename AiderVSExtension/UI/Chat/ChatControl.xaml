@@ -259,7 +259,7 @@
                        Placement="Bottom"
                        StaysOpen="False"
                        AllowsTransparency="True">
-                    <local:ContextMenuControl Name="ContextMenuControl" 
+                    <local:ContextMenuControl Name="ContextMenuControlInstance" 
                                             ItemSelected="ContextMenuControl_ItemSelected"/>
                 </Popup>
                 

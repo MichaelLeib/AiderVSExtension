@@ -16,6 +16,68 @@ namespace AiderVSExtension.Models
         {
             return time >= StartTime && time <= EndTime;
         }
+
+        /// <summary>
+        /// Gets the number of days in this time range
+        /// </summary>
+        public int Days => (int)Duration.TotalDays;
+
+        /// <summary>
+        /// Creates a time range for the last week
+        /// </summary>
+        /// <returns>Time range for the last 7 days</returns>
+        public static TimeRange LastWeek()
+        {
+            var endTime = DateTime.UtcNow;
+            var startTime = endTime.AddDays(-7);
+            return new TimeRange { StartTime = startTime, EndTime = endTime };
+        }
+
+        /// <summary>
+        /// Creates a time range for the last month
+        /// </summary>
+        /// <returns>Time range for the last 30 days</returns>
+        public static TimeRange LastMonth()
+        {
+            var endTime = DateTime.UtcNow;
+            var startTime = endTime.AddDays(-30);
+            return new TimeRange { StartTime = startTime, EndTime = endTime };
+        }
+
+        /// <summary>
+        /// Creates a time range for the last year
+        /// </summary>
+        /// <returns>Time range for the last 365 days</returns>
+        public static TimeRange LastYear()
+        {
+            var endTime = DateTime.UtcNow;
+            var startTime = endTime.AddDays(-365);
+            return new TimeRange { StartTime = startTime, EndTime = endTime };
+        }
+
+        /// <summary>
+        /// Creates a time range for today
+        /// </summary>
+        /// <returns>Time range for today</returns>
+        public static TimeRange Today()
+        {
+            var now = DateTime.UtcNow;
+            var startTime = now.Date;
+            var endTime = startTime.AddDays(1);
+            return new TimeRange { StartTime = startTime, EndTime = endTime };
+        }
+
+        /// <summary>
+        /// Creates a time range for a specific number of days
+        /// </summary>
+        /// <param name="days">Number of days to look back</param>
+        /// <returns>Time range for the specified number of days</returns>
+        public static TimeRange LastDays(int days)
+        {
+            var endTime = DateTime.UtcNow;
+            var startTime = endTime.AddDays(-days);
+            return new TimeRange { StartTime = startTime, EndTime = endTime };
+        }
     }
 
     /// <summary>
